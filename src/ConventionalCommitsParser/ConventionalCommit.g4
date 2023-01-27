@@ -72,10 +72,9 @@ body: SECTION_SEPARATOR values += bodyLine* EOF?;
 
 bodyLine: value = (IDENTIFIER | SENTENCE) NEWLINE?;
 
-footer: SECTION_SEPARATOR values += footerItem+ EOF?;
+footer: SECTION_SEPARATOR values += footerItem+ (SECTION_SEPARATOR* | NEWLINE*)? EOF?;
 
 footerItem: footerKey semicolon footerValue (NEWLINE+| EOF?);
 
-footerValue: value = (IDENTIFIER | SENTENCE);
-
 footerKey: value = (BREAKING_CHANGE | IDENTIFIER);
+footerValue: value = (IDENTIFIER | SENTENCE);

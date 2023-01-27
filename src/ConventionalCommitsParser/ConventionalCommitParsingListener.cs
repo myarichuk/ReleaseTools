@@ -38,8 +38,8 @@ namespace ConventionalCommitsParser
 
         public override void EnterFooterItem(ConventionalCommitParser.FooterItemContext context)
         {
-            var key = context.footerKey().value?.Text.Trim();
-            var value = context.footerValue().value?.Text.Trim();
+            var key = context.footerKey().value?.Text.Trim(' ', '\n','\r');
+            var value = context.footerValue().value?.Text.Trim(' ', '\n','\r');
 
             _parseResult.AddFooterItem(key, value);
         }
