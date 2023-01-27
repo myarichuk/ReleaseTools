@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Antlr4.Runtime" Version="*" />
     <PackageReference Include="FluentAssertions" Version="*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
     <PackageReference Include="xunit" Version="*" />
@@ -24,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ConventionalCommitsParser\ConventionalCommitsParser.csproj" />
+    <ProjectReference Include="..\..\src\ChangelogGenerator.Api\ChangelogGenerator.Api.csproj" />
   </ItemGroup>
 
 </Project>
