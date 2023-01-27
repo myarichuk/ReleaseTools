@@ -168,6 +168,15 @@ and this is line #3
                 this is line #1
                  and this is line #2
                 ")]
+        [InlineData(@"fix(parser):issue description
+
+                foo1: 
+                BREAKING CHANGE: explanation why is there a breaking change
+                ")]
+        [InlineData(@"fix(parser):issue description
+
+                : aaa
+                ")]
         public void Can_fail_incomplete_input(string msg)
         {
             var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
