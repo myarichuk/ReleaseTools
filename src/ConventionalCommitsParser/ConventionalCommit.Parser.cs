@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using ConventionalCommitsParser.ErrorListeners;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
 
 namespace ConventionalCommitsParser
 {
@@ -24,13 +28,29 @@ namespace ConventionalCommitsParser
             new(() => new ConsoleOutputErrorListener());
 #endif
 
-        public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage)
+        /// <summary>
+        /// Try parsing provided conventional commit message
+        /// </summary>
+        /// <param name="commitMessage">the commit message</param>
+        /// <param name="parsedCommitMessage">structure representing the parsed commit message</param>
+        /// <returns>true if parsing successful, false otherwise</returns>
+        public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage) =>
+            TryParse(commitMessage, out parsedCommitMessage, out _);
+
+        /// <summary>
+        /// Try parsing provided conventional commit message
+        /// </summary>
+        /// <param name="commitMessage">the commit message</param>
+        /// <param name="parsedCommitMessage">structure representing the parsed commit message</param>
+        /// <param name="syntaxErrors">list of syntax errors if the parsing has failed</param>
+        /// <returns>true if parsing successful, false otherwise</returns>
+        public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage, out IReadOnlyList<SyntaxErrorInfo>? syntaxErrors)
         {
             parsedCommitMessage = null;
             var lexer = CachedLexer.Value;
             var parser = CachedParser.Value;
             var syntaxErrorListener = SyntaxErrorListener.Value;
-
+            syntaxErrors = null;
 #if DEBUG
             var consoleOutputErrorListener = ConsoleOutputErrorListener.Value;
 #endif
@@ -58,6 +78,7 @@ namespace ConventionalCommitsParser
                 
                 if (syntaxErrorListener.Errors.Count > 0)
                 {
+                    syntaxErrors = syntaxErrorListener.Errors.ToArray();
                     parsedCommitMessage = null;
                 }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ConventionalCommitsParser
 {
@@ -9,7 +10,7 @@ namespace ConventionalCommitsParser
         public ConventionalCommit ParsedMessage => _parseResult;
 
         public override void EnterDescription(ConventionalCommitParser.DescriptionContext context) => 
-            _parseResult.Description = context.value.Text.Trim();
+            _parseResult.Description = context.value.Text.Trim(' ', '\t', '\r');
 
         public override void EnterCommitType(ConventionalCommitParser.CommitTypeContext context)
         {
@@ -32,11 +33,8 @@ namespace ConventionalCommitsParser
             }
         }
 
-        public override void EnterBodyLine(ConventionalCommitParser.BodyLineContext context)
-        {
-            _parseResult.Body ??= string.Empty;
-            _parseResult.Body += context.value?.Text.Trim();
-        }
+        public override void EnterBody(ConventionalCommitParser.BodyContext context) => 
+            _parseResult.Body = string.Join(Environment.NewLine, context.bodyLine().Select(x => (x.value?.Text ?? string.Empty).Trim(' ', '\n','\r')));
 
         public override void EnterFooterItem(ConventionalCommitParser.FooterItemContext context)
         {
