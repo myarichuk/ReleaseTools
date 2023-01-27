@@ -1,8 +1,8 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using System;
 using Antlr4.Runtime;
-using System;
+using Antlr4.Runtime.Misc;
 
-namespace ConventionalCommitsParser
+namespace ConventionalCommitsParser.ErrorListeners
 {
     internal class ConsoleOutputErrorListener : BaseErrorListener
     {
@@ -14,11 +14,8 @@ namespace ConventionalCommitsParser
             string msg,
             RecognitionException e)
         {
-            var input = ((ICharStream)recognizer.InputStream)
-                .GetText(new Interval(0, offendingSymbol.StopIndex));
-
             Console.WriteLine($"Error at line {line}, position {charPositionInLine}: {msg}");
-            Console.WriteLine($"Offending text: {input.Substring(offendingSymbol.StartIndex, offendingSymbol.StopIndex - offendingSymbol.StartIndex + 1)}");
+            Console.WriteLine($"Offending text: {offendingSymbol.Text}");
         }
     }
 

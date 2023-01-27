@@ -66,7 +66,7 @@ description:  WHITESPACE* value = (IDENTIFIER | SENTENCE);
 
 commitType: value = COMMIT_TYPE isBreaking = EXCLAMATION?;
 
-commitScope: LPAREN value = IDENTIFIER RPAREN isBreaking = EXCLAMATION? WHITESPACE*;
+commitScope: LPAREN value = (IDENTIFIER | SENTENCE) RPAREN isBreaking = EXCLAMATION? WHITESPACE*;
 
 body: SECTION_SEPARATOR values += bodyLine* EOF?;
 

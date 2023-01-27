@@ -16,7 +16,7 @@
         Feat,
 
         /// <summary>
-        /// A issue fix
+        /// A fix of an issue
         /// </summary>
         Fix,
 

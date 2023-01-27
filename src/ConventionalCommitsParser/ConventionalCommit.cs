@@ -19,7 +19,7 @@ namespace ConventionalCommitsParser
         /// <summary>
         /// Is commit is breaking? (denoted by '!' character before type part)
         /// </summary>
-        public bool Breaking { get; internal set; }
+        public bool IsBreaking { get; internal set; }
 
         /// <summary>
         /// This is an optional field that can be used to specify the area of the code that the commit relates to. For example, fix(parser) would indicate that the issue fix was made to the parser.
@@ -58,14 +58,14 @@ namespace ConventionalCommitsParser
         /// </summary>
         /// <param name="type"></param>
         /// <param name="description"></param>
-        /// <param name="breaking"></param>
+        /// <param name="isBreaking"></param>
         /// <param name="scope"></param>
         /// <param name="body"></param>
         /// <param name="footer"></param>
         public ConventionalCommit(
             string type,
             string description, 
-            bool breaking = false, 
+            bool isBreaking = false, 
             string? scope = null,
             string? body = null,
             IDictionary<string, string>? footer = null)
@@ -73,7 +73,7 @@ namespace ConventionalCommitsParser
             Type = Enum.TryParse<CommitType>(type, true, out var parsedEnum) ? parsedEnum : CommitType.Other;
             Scope = scope;
             Description = description;
-            Breaking = breaking;
+            IsBreaking = isBreaking;
             Body = body;
             _footer = footer != null ? new Dictionary<string, string>(footer): new Dictionary<string, string>();
         }
@@ -83,7 +83,7 @@ namespace ConventionalCommitsParser
             var sb = new StringBuilder();
 
             sb.Append(Type);
-            if (Breaking)
+            if (IsBreaking)
                 sb.Append('!');
 
             if (!string.IsNullOrWhiteSpace(Scope))
