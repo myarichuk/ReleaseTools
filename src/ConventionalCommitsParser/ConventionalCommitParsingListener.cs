@@ -41,6 +41,12 @@ namespace ConventionalCommitsParser
             var key = context.footerKey().value?.Text.Trim(' ', '\n','\r');
             var value = context.footerValue().value?.Text.Trim(' ', '\n','\r');
 
+            var keyContext = context.footerKey();
+            if (keyContext.BREAKING_CHANGE() != null && !_parseResult.IsBreaking)
+            {
+                _parseResult.IsBreaking = true;
+            }
+
             _parseResult.AddFooterItem(key, value);
         }
     }
