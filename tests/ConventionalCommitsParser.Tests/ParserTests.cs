@@ -31,12 +31,14 @@ namespace ConventionalCommitsParser.Tests
 
                 this is line #1
                  and this is line #2
+            and this is line #3
                 ")]
         [InlineData(@"fix(parser):issue description
 
 
                 this is line #1
                  and this is line #2
+and this is line #3
                 ")]
         [InlineData(@"fix(parser):issue description
 
@@ -45,6 +47,7 @@ namespace ConventionalCommitsParser.Tests
 
                 this is line #1
                  and this is line #2
+                    and this is line #3            
                 ")]
         public void Can_parse_body_section(string msg)
         {
@@ -58,8 +61,61 @@ namespace ConventionalCommitsParser.Tests
             parsedCommitMessage?.Scope.Should().Be("parser");
             parsedCommitMessage?.Description.Should().Be("issue description");
 
-            parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2");
+            parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3");
         }
+
+        [Theory(DisplayName = "Can parse footer section after body in a commit message")]
+        [InlineData(@"fix(parser):issue description
+
+                this is line #1
+                 and this is line #2
+
+                foo1: bar1
+                foo2: bar2
+                ")]
+        [InlineData(@"fix(parser):issue description
+
+
+                this is line #1
+                 and this is line #2
+
+
+                foo1: bar1
+                foo2: bar2
+
+                ")]
+        [InlineData(@"fix(parser):issue description
+
+
+
+
+                this is line #1
+                    and this is line #2
+
+
+
+
+                foo1: bar1
+                foo2: bar2               
+                ")]
+        public void Can_parse_body_and_footer_section(string msg)
+        {
+            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+
+            syntaxErrors.Should().BeNull();
+            isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
+            parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
+
+            parsedCommitMessage?.Type.Should().Be(CommitType.Fix);
+            parsedCommitMessage?.Scope.Should().Be("parser");
+            parsedCommitMessage?.Description.Should().Be("issue description");
+
+            parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2");
+
+            parsedCommitMessage.Footer.Should().NotBeEmpty();
+        }
+
+
 
         [Theory(DisplayName = "Can parse message with scope")]
         [InlineData("fix(parser):issue description")]
