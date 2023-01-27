@@ -51,7 +51,10 @@ namespace ConventionalCommitsParser
                 _parseResult.IsBreaking = true;
             }
 
-            _parseResult.AddFooterItem(key, value);
+            if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
+            {
+                _parseResult.AddFooterItem(key!, value!);
+            }
         }
     }
 }
