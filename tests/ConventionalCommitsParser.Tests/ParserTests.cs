@@ -64,6 +64,30 @@ and this is line #3
             parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3");
         }
 
+        [Theory(DisplayName = "Can detect breaking change")]
+        [InlineData("fix(parser)!: issue description")]
+        [InlineData("fix!(parser)!: issue description")]
+        [InlineData(@"fix(parser):issue description
+
+                foo1: bar1
+                BREAKING-CHANGE: explanation why is there a breaking change
+                ")]
+        [InlineData(@"fix(parser):issue description
+
+                foo1: bar1
+                BREAKING CHANGE: explanation why is there a breaking change
+                ")]
+        public void Can_detect_breaking_change_flag(string msg)
+        {
+            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+
+            syntaxErrors.Should().BeNull();
+            isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
+            parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
+
+            parsedCommitMessage.IsBreaking.Should().BeTrue();
+        }
+
         [Theory(DisplayName = "Can parse footer section after body in a commit message")]
         [InlineData(@"fix(parser):issue description
 
