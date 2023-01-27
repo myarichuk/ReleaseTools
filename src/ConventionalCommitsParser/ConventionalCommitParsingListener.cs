@@ -5,7 +5,9 @@ namespace ConventionalCommitsParser
 {
     internal class ConventionalCommitParsingListener: ConventionalCommitBaseListener
     {
-        private readonly ConventionalCommit _parseResult = new();
+        private ConventionalCommit _parseResult = new();
+
+        public void Reset() => _parseResult = new();
 
         public ConventionalCommit ParsedMessage => _parseResult;
 
@@ -34,7 +36,9 @@ namespace ConventionalCommitsParser
         }
 
         public override void EnterBody(ConventionalCommitParser.BodyContext context) => 
-            _parseResult.Body = string.Join(Environment.NewLine, context.bodyLine().Select(x => (x.value?.Text ?? string.Empty).Trim(' ', '\n','\r')));
+            _parseResult.Body = string.Join(Environment.NewLine, 
+                context.bodyLine().Select(x => 
+                    (x.value?.Text ?? string.Empty).Trim(' ', '\n','\r')));
 
         public override void EnterFooterItem(ConventionalCommitParser.FooterItemContext context)
         {

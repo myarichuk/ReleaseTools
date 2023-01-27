@@ -15,17 +15,20 @@ namespace ConventionalCommitsParser
     public partial class ConventionalCommit
     {
         private static readonly ThreadLocal<ConventionalCommitLexer> CachedLexer = 
-            new(() => new ConventionalCommitLexer(null));
+            new(() => new(null));
 
         private static readonly ThreadLocal<ConventionalCommitParser> CachedParser = 
-            new(() => new ConventionalCommitParser(null));
+            new(() => new(null));
 
         private static readonly ThreadLocal<SyntaxErrorListener> SyntaxErrorListener =
-            new(() => new SyntaxErrorListener());
+            new(() => new ());
+
+        private static readonly ThreadLocal<ConventionalCommitParsingListener> ParsingWalker =
+            new(() => new ());
 
 #if DEBUG
         private static readonly ThreadLocal<ConsoleOutputErrorListener> ConsoleOutputErrorListener = 
-            new(() => new ConsoleOutputErrorListener());
+            new(() => new());
 #endif
 
         /// <summary>
@@ -50,6 +53,9 @@ namespace ConventionalCommitsParser
             var lexer = CachedLexer.Value;
             var parser = CachedParser.Value;
             var syntaxErrorListener = SyntaxErrorListener.Value;
+            var listener = ParsingWalker.Value;
+            listener.Reset();
+            
             syntaxErrors = null;
 #if DEBUG
             var consoleOutputErrorListener = ConsoleOutputErrorListener.Value;
@@ -71,7 +77,6 @@ namespace ConventionalCommitsParser
                 var ast = parser.commitMessage();
                 
                 
-                var listener = new ConventionalCommitParsingListener();
                 ParseTreeWalker.Default.Walk(listener, ast);
 
                 parsedCommitMessage = listener.ParsedMessage;
