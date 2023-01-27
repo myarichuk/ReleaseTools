@@ -1,31 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ConventionalCommitsParser
 {
-    /*
-        List of common types used across different variants of the conventional commit convention:
-        ==========================================================================================
-        * feat: A new feature
-        * fix: A issue fix
-        * docs: Documentation changes
-        * style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-        * refactor: A code change that neither fixes a issue nor adds a feature
-        * perf: A code change that improves performance
-        * test: Adding missing tests or correcting existing tests
-        * chore: Other changes that don't modify src or test files
-        * build: Changes that affect the build system or external dependencies
-        * ci: Changes to CI configuration files and scripts
-        * breaking: A change that breaks backward compatibility
-        * security: Changes related to security
-        * revert: Revert a previous commit
-        * config: Changes to the project configuration
-        * upgrade: Upgrades package dependencies
-        * downgrade: Downgrades package dependencies
-        * pin: Pin package dependencies
-     */
-
     /// <summary>
     /// An object that represents a conventional commit messages
     /// </summary>
@@ -34,32 +14,44 @@ namespace ConventionalCommitsParser
         /// <summary>
         /// Type of the commit, varies from convention to convention
         /// </summary>
-        public string Type { get; }
+        public CommitType Type { get; internal set; }
 
         /// <summary>
         /// Is commit is breaking? (denoted by '!' character before type part)
         /// </summary>
-        public bool Breaking { get; }
+        public bool Breaking { get; internal set; }
 
         /// <summary>
         /// This is an optional field that can be used to specify the area of the code that the commit relates to. For example, fix(parser) would indicate that the issue fix was made to the parser.
         /// </summary>
-        public string? Scope { get; }
+        public string? Scope { get; internal set; }
 
         /// <summary>
         /// This is a brief, one-line summary of the changes made in the commit.
         /// </summary>
-        public string Description { get; }
+        public string Description { get; internal set; }
 
         /// <summary>
         /// This is an optional section where you can provide more detailed information about the changes made in the commit.
         /// </summary>
-        public string? Body { get; }
+        public string? Body { get; internal set; }
+
+        private readonly Dictionary<string, string> _footer = new();
 
         /// <summary>
         /// This is an optional section where you can include information such as related issues, breaking changes, or other notes.
         /// </summary>
-        public IReadOnlyDictionary<string ,string>? Footer { get; }
+        public IReadOnlyDictionary<string, string> Footer => _footer;
+
+        internal void AddFooterItem(string key, string value) => _footer.Add(key, value);
+
+        /// <summary>
+        /// Initializes an empty new instance of the <see cref="ConventionalCommit"/> class
+        /// </summary>
+        public ConventionalCommit()
+        {
+            Description = string.Empty;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConventionalCommit"/> class
@@ -76,14 +68,14 @@ namespace ConventionalCommitsParser
             bool breaking = false, 
             string? scope = null,
             string? body = null,
-            IReadOnlyDictionary<string, string>? footer = null)
+            IDictionary<string, string>? footer = null)
         {
-            Type = type;
+            Type = Enum.TryParse<CommitType>(type, true, out var parsedEnum) ? parsedEnum : CommitType.Other;
             Scope = scope;
             Description = description;
             Breaking = breaking;
             Body = body;
-            Footer = footer;
+            _footer = footer != null ? new Dictionary<string, string>(footer): new Dictionary<string, string>();
         }
 
         public override string ToString()
