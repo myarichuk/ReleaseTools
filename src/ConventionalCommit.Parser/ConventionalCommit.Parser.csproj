@@ -3,6 +3,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
+    <Title>Conventional Commits Parser</Title>
+    <Authors>michael.yarichuk</Authors>
+    <Description>An ANTLR4 based parser for conventional commits as described in the spec.</Description>
+    <RepositoryUrl>https://github.com/myarichuk/ReleaseTools</RepositoryUrl>
+    <PackageTags>conventional commits;parser;antlr4;antlr;conventional-commit;conventional commit</PackageTags>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Antlr4.CodeGenerator" Version="*">
