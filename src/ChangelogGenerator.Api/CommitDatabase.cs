@@ -38,20 +38,20 @@ public class CommitDatabase: IDisposable
     public IEnumerable<Commit> Query(Sorting commitSorting = Sorting.NewestFirst) => 
         _repository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
 
-    public IEnumerable<Commit> Query(Commit oldestCommitToInclude, Sorting commitSorting = Sorting.NewestFirst)
+    public IEnumerable<Commit> Query(Commit includeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst)
     {
         return _repository.Commits.QueryBy(new CommitFilter
         {
-            IncludeReachableFrom = oldestCommitToInclude.Sha,
+            IncludeReachableFrom = includeFromThisCommit.Sha,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
     }
 
-    public IEnumerable<Commit> Query(string startShaOrTag, string endShaOrTag, Sorting commitSorting = Sorting.NewestFirst) => 
+    public IEnumerable<Commit> Query(Commit includeFromThisCommit, Commit excludeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) => 
         _repository.Commits.QueryBy(new CommitFilter
         {
-            IncludeReachableFrom = startShaOrTag,
-            ExcludeReachableFrom = endShaOrTag,
+            IncludeReachableFrom = includeFromThisCommit,
+            ExcludeReachableFrom = excludeFromThisCommit.Parents,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
 
