@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using ConventionalCommit.Parser;
+using FluentAssertions;
 
 namespace ConventionalCommitsParser.Tests
 {
@@ -8,7 +9,7 @@ namespace ConventionalCommitsParser.Tests
         public void Can_parse_minimal()
         {
             const string msg = "fix: issue description";
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
 
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
@@ -21,7 +22,7 @@ namespace ConventionalCommitsParser.Tests
         public void Should_fail_parse_non_spec_type()
         {
             const string msg = "foobar: issue description";
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
             isParsingSuccessful.Should().BeFalse("Calling ConventionalCommit::TryParse() on a message with non-spec type should return false");
 
         }
@@ -51,7 +52,7 @@ and this is line #3
                 ")]
         public void Can_parse_body_section(string msg)
         {
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
 
             syntaxErrors.Should().BeNull();
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
@@ -79,7 +80,7 @@ and this is line #3
                 ")]
         public void Can_detect_breaking_change_flag(string msg)
         {
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
 
             syntaxErrors.Should().BeNull();
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
@@ -124,7 +125,7 @@ and this is line #3
                 ")]
         public void Can_parse_body_and_footer_section(string msg)
         {
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
 
             syntaxErrors.Should().BeNull();
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
@@ -149,7 +150,7 @@ and this is line #3
         [InlineData("  fix (  parser) :       issue description  ")]
         public void Can_parse_full_without_body_and_footer(string msg)
         {
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
 
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
@@ -179,7 +180,7 @@ and this is line #3
                 ")]
         public void Can_fail_incomplete_input(string msg)
         {
-            var isParsingSuccessful = ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
+            var isParsingSuccessful = ConventionalCommit.Parser.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
 
             isParsingSuccessful.Should().BeFalse("Calling ConventionalCommit::TryParse() on a malformed message should return false");
             parsedCommitMessage.Should().BeNull("Calling ConventionalCommit::TryParse() on a malformed message return null message");

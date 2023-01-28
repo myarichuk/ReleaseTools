@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 
-namespace ConventionalCommitsParser
+namespace ConventionalCommit.Parser
 {
     /// <summary>
     /// An object that represents a conventional commit messages

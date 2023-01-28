@@ -1,8 +1,7 @@
 ﻿using System;
 using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
 
-namespace ConventionalCommitsParser.ErrorListeners
+namespace ConventionalCommit.Parser.ErrorListeners
 {
     internal class ConsoleOutputErrorListener : BaseErrorListener
     {

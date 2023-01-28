@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConventionalCommitsParser
+namespace ConventionalCommit.Parser
 {
     /// <summary>
     /// A class of an exception that will be thrown when an unhandled error occurs.
