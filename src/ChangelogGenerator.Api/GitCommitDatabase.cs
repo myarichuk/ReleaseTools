@@ -29,19 +29,21 @@ public class GitCommitDatabase: IDisposable
     }
 
     public IEnumerable<Commit> Query() => 
-        _repository.Commits.QueryBy(new CommitFilter());
+        _repository.Commits.QueryBy(new CommitFilter {SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological});
 
     public IEnumerable<Commit> Query(string startShaOrTag) => 
         _repository.Commits.QueryBy(new CommitFilter
         {
-            IncludeReachableFrom = startShaOrTag
+            IncludeReachableFrom = startShaOrTag,
+            SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological
         });
 
     public IEnumerable<Commit> Query(string startShaOrTag, string endShaOrTag) => 
         _repository.Commits.QueryBy(new CommitFilter
         {
             IncludeReachableFrom = startShaOrTag,
-            ExcludeReachableFrom = endShaOrTag
+            ExcludeReachableFrom = endShaOrTag,
+            SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological
         });
 
     private void AssertRepositoryInGoodState()
