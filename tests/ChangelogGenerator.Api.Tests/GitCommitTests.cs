@@ -25,31 +25,84 @@ namespace ChangelogGenerator.Api.Tests
             _repository = new Repository(_repositoryFolder);
         }
 
-        [Fact]
+        [Fact(DisplayName = "Can fetch specific commit from Query() method")]
+        public void Can_fetch_specific_commit()
+        {
+            using var commitDb = new CommitDatabase(_repositoryFolder);
+
+            for (int i = 1; i < 6; i++)
+            {
+                CommitDummyFile($"foobar{i}.txt");
+            }
+
+            var commitInfoByMessage = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar3.txt\n");
+            commitInfoByMessage.Should().NotBeNull();
+
+            var commitInfoBySha = commitDb.Query().FirstOrDefault(c => c.Tree.Sha == commitInfoByMessage!.Tree.Sha);
+            commitInfoBySha.Should().NotBeNull();
+        }
+
+        [Fact(DisplayName = "Can fetch all commits")]
         public void Can_fetch_commits()
         {
-            using var commitDb = new GitCommitDatabase(_repositoryFolder);
+            using var commitDb = new CommitDatabase(_repositoryFolder);
 
-            File.WriteAllText(Path.Combine(_repositoryFolder, "foobar1.txt"), "some file contents");
-            
-            Commands.Stage(_repository, "*");
-            _repository.Commit("commit A", DefaultSignature, DefaultSignature);
-
-            File.WriteAllText(Path.Combine(_repositoryFolder, "foobar2.txt"), "some file contents");
-            
-            Commands.Stage(_repository, "*");
-            _repository.Commit("commit B", DefaultSignature, DefaultSignature);
-
-            File.WriteAllText(Path.Combine(_repositoryFolder, "foobar3.txt"), "some file contents");
-            
-            Commands.Stage(_repository, "*");
-            _repository.Commit("commit C", DefaultSignature, DefaultSignature);
+            for (int i = 1; i < 6; i++)
+            {
+                CommitDummyFile($"foobar{i}.txt");
+            }
             
             var commitsQueryResult = commitDb.Query().ToArray();
 
-            commitsQueryResult.Should().HaveCount(3);
             var commitMessages = commitsQueryResult.Select(x => x.Message);
-            commitMessages.Should().ContainInOrder("commit A\n", "commit B\n", "commit C\n");
+            commitMessages.Should()
+                .ContainInOrder(
+                    "add file foobar1.txt\n",
+                    "add file foobar2.txt\n",
+                    "add file foobar3.txt\n",
+                    "add file foobar4.txt\n",
+                    "add file foobar5.txt\n");
+        }
+
+        [Fact(DisplayName = "Can fetch commits starting from specific sha")]
+        public void Can_fetch_commits_starting_from_sha()
+        {
+            using var commitDb = new CommitDatabase(_repositoryFolder);
+
+            for (int i = 1; i < 6; i++)
+            {
+                CommitDummyFile($"foobar{i}.txt");
+            }
+
+            var commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar3.txt\n");
+            commitInfo.Should().NotBeNull(); //sanity check
+
+            var boundedCommitsQueryResults = commitDb.Query(commitInfo!);
+            
+            var commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
+            commitMessages.Should()
+                .ContainInOrder(
+                    "add file foobar1.txt\n",
+                    "add file foobar2.txt\n",
+                    "add file foobar3.txt\n");
+
+            commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            commitInfo.Should().NotBeNull(); 
+
+            boundedCommitsQueryResults = commitDb.Query(commitInfo!);
+            commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
+            commitMessages.Should()
+                .ContainInOrder(
+                    "add file foobar1.txt\n",
+                    "add file foobar2.txt\n");
+        }
+
+        private void CommitDummyFile(string filename)
+        {
+            File.WriteAllText(Path.Combine(_repositoryFolder, filename), "some file contents");
+
+            Commands.Stage(_repository, "*");
+            _repository.Commit($"add file {filename}", DefaultSignature, DefaultSignature);
         }
 
         private void DeleteOldTestRepos()

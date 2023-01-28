@@ -1,13 +1,20 @@
 ﻿using LibGit2Sharp;
+using static ChangelogGenerator.Api.CommitDatabase;
 
 namespace ChangelogGenerator.Api;
 
-public class GitCommitDatabase: IDisposable
+public class CommitDatabase: IDisposable
 {
     private bool _isDisposed;
     private readonly Repository _repository;
 
-    public GitCommitDatabase(string repositoryPath)
+    public enum Sorting
+    {
+        NewestFirst,
+        OldestFirst
+    }
+
+    public CommitDatabase(string repositoryPath)
     {
         ThrowIfInvalidRepo(repositoryPath);
 
@@ -15,7 +22,7 @@ public class GitCommitDatabase: IDisposable
         AssertRepositoryInGoodState();
     }
 
-    public GitCommitDatabase(string repositoryPath, string username, string email)
+    public CommitDatabase(string repositoryPath, string username, string email)
     {
         ThrowIfInvalidRepo(repositoryPath);
 
@@ -28,22 +35,24 @@ public class GitCommitDatabase: IDisposable
         AssertRepositoryInGoodState();
     }
 
-    public IEnumerable<Commit> Query() => 
-        _repository.Commits.QueryBy(new CommitFilter {SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological});
+    public IEnumerable<Commit> Query(Sorting commitSorting = Sorting.NewestFirst) => 
+        _repository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
 
-    public IEnumerable<Commit> Query(string startShaOrTag) => 
-        _repository.Commits.QueryBy(new CommitFilter
+    public IEnumerable<Commit> Query(Commit oldestCommitToInclude, Sorting commitSorting = Sorting.NewestFirst)
+    {
+        return _repository.Commits.QueryBy(new CommitFilter
         {
-            IncludeReachableFrom = startShaOrTag,
-            SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological
+            IncludeReachableFrom = oldestCommitToInclude.Sha,
+            SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
+    }
 
-    public IEnumerable<Commit> Query(string startShaOrTag, string endShaOrTag) => 
+    public IEnumerable<Commit> Query(string startShaOrTag, string endShaOrTag, Sorting commitSorting = Sorting.NewestFirst) => 
         _repository.Commits.QueryBy(new CommitFilter
         {
             IncludeReachableFrom = startShaOrTag,
             ExcludeReachableFrom = endShaOrTag,
-            SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological
+            SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
 
     private void AssertRepositoryInGoodState()
@@ -77,5 +86,5 @@ public class GitCommitDatabase: IDisposable
         GC.SuppressFinalize(this);
     }
 
-    ~GitCommitDatabase() => Dispose();
+    ~CommitDatabase() => Dispose();
 }
