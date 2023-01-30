@@ -2,7 +2,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
-namespace ConventionalCommit.Parser.ErrorListeners
+namespace Parser.ConventionalCommit.ErrorListeners
 {
     internal class SyntaxErrorListener: BaseErrorListener
     {

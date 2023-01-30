@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ConventionalCommit.Parser\ConventionalCommit.Parser.csproj" />
+    <ProjectReference Include="..\..\src\Parser.ConventionalCommit\Parser.ConventionalCommit.csproj" />
   </ItemGroup>
 
 </Project>

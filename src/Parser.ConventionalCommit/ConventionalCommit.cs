@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConventionalCommit.Parser
+namespace Parser.ConventionalCommit
 {
     /// <summary>
     /// An object that represents a conventional commit messages

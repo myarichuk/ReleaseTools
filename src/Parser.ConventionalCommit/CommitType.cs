@@ -1,4 +1,4 @@
-﻿namespace ConventionalCommit.Parser
+﻿namespace Parser.ConventionalCommit
 {
     /// <summary>
     /// Details valid commit types, as per conventional commit spec

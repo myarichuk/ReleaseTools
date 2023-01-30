@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using ConventionalCommit.Parser.ErrorListeners;
+using Parser.ConventionalCommit.ErrorListeners;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
 
-namespace ConventionalCommit.Parser
+namespace Parser.ConventionalCommit
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public partial class ConventionalCommit

@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 
-namespace ConventionalCommit.Parser.ErrorListeners
+namespace Parser.ConventionalCommit.ErrorListeners
 {
     /// <summary>
     /// An object that holds information about syntax error encountered during parsing

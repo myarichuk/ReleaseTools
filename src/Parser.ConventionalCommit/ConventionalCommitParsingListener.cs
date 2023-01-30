@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace ConventionalCommit.Parser
+namespace Parser.ConventionalCommit
 {
     internal class ConventionalCommitParsingListener: ConventionalCommitBaseListener
     {
