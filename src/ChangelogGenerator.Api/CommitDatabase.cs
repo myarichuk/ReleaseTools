@@ -1,51 +1,37 @@
-﻿using LibGit2Sharp;
+﻿using System.Runtime.CompilerServices;
+using LibGit2Sharp;
 using static ChangelogGenerator.Api.CommitDatabase;
 
 namespace ChangelogGenerator.Api;
 
-public class CommitDatabase: IDisposable
+public class CommitDatabase: GitObjectDatabase<Commit>
 {
-    private bool _isDisposed;
-    private readonly Repository _repository;
-
     public enum Sorting
     {
         NewestFirst,
         OldestFirst
     }
 
-    public CommitDatabase(string repositoryPath)
+    public CommitDatabase(string repositoryPath): base(repositoryPath)
     {
-        ThrowIfInvalidRepo(repositoryPath);
-
-        _repository = new Repository(repositoryPath);
-        AssertRepositoryInGoodState();
     }
 
-    public CommitDatabase(string repositoryPath, string username, string email)
+    public CommitDatabase(string repositoryPath, string username, string email): base(repositoryPath, username, email)
     {
-        ThrowIfInvalidRepo(repositoryPath);
-
-        _repository = new Repository(
-            repositoryPath,
-            new RepositoryOptions
-            {
-                Identity = new Identity(username, email)
-            });
-        AssertRepositoryInGoodState();
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override IEnumerable<Commit> Query() => _repository.Commits;
 
     public IEnumerable<Commit> Query(Sorting commitSorting = Sorting.NewestFirst) => 
         _repository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
 
-    public IEnumerable<Commit> Query(Commit includeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst)
-    {
-        return _repository.Commits.QueryBy(new CommitFilter
+    public IEnumerable<Commit> Query(Commit includeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) =>
+        _repository.Commits.QueryBy(new CommitFilter
         {
             IncludeReachableFrom = includeFromThisCommit.Sha,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
-    }
 
     public IEnumerable<Commit> Query(Commit includeFromThisCommit, Commit excludeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) => 
         _repository.Commits.QueryBy(new CommitFilter
@@ -54,37 +40,4 @@ public class CommitDatabase: IDisposable
             ExcludeReachableFrom = excludeFromThisCommit.Parents,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
-
-    private void AssertRepositoryInGoodState()
-    {
-        if (_repository.Info.CurrentOperation != CurrentOperation.None)
-        {
-            throw new RepositoryNotReadyException($"Repository is in the middle of a pending interactive operation. Cannot continue. (operation type = {_repository.Info.CurrentOperation})");
-        }
-    }
-
-    private static void ThrowIfInvalidRepo(string repositoryPath)
-    {
-        if (!Repository.IsValid(repositoryPath))
-        {
-            throw new ArgumentException($"The path '{repositoryPath}' is not a valid git repository");
-        }
-    }
-    
-    private void DisposeThis()
-    {
-        if (!_isDisposed)
-        {
-            _isDisposed = true;
-            _repository.Dispose();
-        }
-    }
-
-    public void Dispose()
-    {
-        DisposeThis();
-        GC.SuppressFinalize(this);
-    }
-
-    ~CommitDatabase() => Dispose();
 }
