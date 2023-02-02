@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Title>Semantic Version Parser</Title>
+    <Authors>michael.yarichuk</Authors>
+    <Description>An ANTLR4 based parser for semantic versions.</Description>
+    <RepositoryUrl>https://github.com/myarichuk/ReleaseTools</RepositoryUrl>
+    <PackageTags>semver;parser;antlr4;antlr;semantic-version;semantic version</PackageTags>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Antlr4.CodeGenerator" Version="*">
@@ -9,5 +20,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="*" />
+    </ItemGroup>
+    <ItemGroup>
+      <Antlr4 Update="ConventionalCommit.g4">
+        <DefaultCustomToolNamespace>$([MSBuild]::ValueOrDefault('$(RootNamespace).%(DefaultCustomToolNamespace)', '').TrimEnd('.'))</DefaultCustomToolNamespace>
+        <CustomToolNamespace>$([MSBuild]::ValueOrDefault(%(CustomToolNamespace), %(DefaultCustomToolNamespace)))</CustomToolNamespace>
+      </Antlr4>
     </ItemGroup>
 </Project>
