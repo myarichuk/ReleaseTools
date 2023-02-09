@@ -67,6 +67,9 @@ namespace Parser.ConventionalCommit
             {
 
                 lexer!.SetInputStream(new AntlrInputStream(commitMessage));
+                var tokens = lexer.GetAllTokens().Select(x => (x.Type, x.Text)).ToArray();
+                lexer.Reset();
+
                 parser!.SetInputStream(new CommonTokenStream(lexer));
 
                 parser.RemoveErrorListeners();

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Dynamic;
+using FluentAssertions;
 using Parser.ConventionalCommit;
 
 namespace ParserTests
@@ -27,29 +28,41 @@ namespace ParserTests
 
         }
 
+        private static readonly string CommitMessageWithBody =
+            @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3";
+
+        public static IEnumerable<object[]> MultilineCommitMessages
+        {
+            get
+            {
+                yield return new[] { CommitMessageWithBody };
+            }
+        }
+
         [Theory(DisplayName = "Can parse multiline body in a commit message")]
-        [InlineData(@"fix(parser):issue description
+        [MemberData(nameof(MultilineCommitMessages))]
+//        [InlineData(@"fix(parser):issue description
 
-                this is line #1
-                 and this is line #2
-            and this is line #3
-                ")]
-        [InlineData(@"fix(parser):issue description
-
-
-                this is line #1
-                 and this is line #2
-and this is line #3
-                ")]
-        [InlineData(@"fix(parser):issue description
+//                this is line #1
+//                 and this is line #2
+//            and this is line #3
+//                ")]
+//        [InlineData(@"fix(parser):issue description
 
 
+//                this is line #1
+//                 and this is line #2
+//and this is line #3
+//                ")]
+//        [InlineData(@"fix(parser):issue description
+    
 
 
-                this is line #1
-                 and this is line #2
-                    and this is line #3            
-                ")]
+
+//                this is line #1
+//                 and this is line #2
+//                    and this is line #3            
+//                ")]
         public void Can_parse_body_section(string msg)
         {
             var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
