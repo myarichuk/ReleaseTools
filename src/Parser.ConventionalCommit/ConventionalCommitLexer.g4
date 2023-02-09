@@ -76,7 +76,7 @@ SCOPE: [a-z] [a-z0-9_/\\]* -> type(IDENTIFIER);
 END_OF_SCOPE: ')' -> mode(DEFAULT_MODE), type(RPAREN);
 
 mode Text;
-TEXT: ~([\r\n] | [\n])+ -> mode(DEFAULT_MODE);
+TEXT: ~([\r\n] | [\n])+ { Mode(0); };
 
 mode Footer;
 KEY: IDENTIFIER -> type(IDENTIFIER), mode(DEFAULT_MODE);

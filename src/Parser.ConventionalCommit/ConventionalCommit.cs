@@ -15,6 +15,11 @@ namespace Parser.ConventionalCommit
         public CommitType Type { get; internal set; }
 
         /// <summary>
+        /// Type of the commit, either equals the <seealso cref="Type"/> value or if 'Other' then equals the other type
+        /// </summary>
+        public string TypeAsString { get; internal set; }
+
+        /// <summary>
         /// Is commit is breaking? (denoted by '!' character before type part)
         /// </summary>
         public bool IsBreaking { get; internal set; }
@@ -69,6 +74,7 @@ namespace Parser.ConventionalCommit
             IDictionary<string, string>? footer = null)
         {
             Type = Enum.TryParse<CommitType>(type, true, out var parsedEnum) ? parsedEnum : CommitType.Other;
+            TypeAsString = type;
             Scope = scope;
             Description = description;
             IsBreaking = isBreaking;
@@ -80,7 +86,7 @@ namespace Parser.ConventionalCommit
         {
             var sb = new StringBuilder();
 
-            sb.Append(Type);
+            sb.Append(TypeAsString);
             if (IsBreaking)
                 sb.Append('!');
 

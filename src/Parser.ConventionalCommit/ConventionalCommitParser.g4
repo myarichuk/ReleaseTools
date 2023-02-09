@@ -22,14 +22,15 @@ type: value = IDENTIFIER      #OtherType
         | PIN)               #RecorgnizedType
     ;
 
-footerTuple: NEWLINE key = IDENTIFIER COLON value = TEXT;
-footer: NEXT_SECTION footerTuple footerTuple*;
+footerTuple: key = IDENTIFIER COLON value = TEXT;
+footer: NEXT_SECTION footerTuple (NEWLINE footerTuple)*;
 
-body: NEXT_SECTION NEWLINE TEXT;
+body: NEXT_SECTION TEXT (NEWLINE TEXT)*;
 
 commitMessage: 
     type 
     LPAREN scope = IDENTIFIER RPAREN COLON 
     description = TEXT
     body? 
-    footer? EOF;
+    footer? 
+    EOF;

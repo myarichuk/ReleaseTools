@@ -28,14 +28,20 @@ namespace ParserTests
 
         }
 
+        private static readonly string CommitMessageSimple = $"fix(parser):issue description";
         private static readonly string CommitMessageWithBody =
             @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3";
+
+        private static readonly string CommitMessageWithBodyAndFooter =
+            @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3{Environment.NewLine}{Environment.NewLine}foo: bar{Environment.NewLine}bar: foo";
 
         public static IEnumerable<object[]> MultilineCommitMessages
         {
             get
             {
+                yield return new[] { CommitMessageSimple };
                 yield return new[] { CommitMessageWithBody };
+                yield return new[] { CommitMessageWithBodyAndFooter };
             }
         }
 
