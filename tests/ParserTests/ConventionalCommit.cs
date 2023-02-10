@@ -1,11 +1,58 @@
 ﻿using System.Dynamic;
 using FluentAssertions;
 using Parser.ConventionalCommit;
+using Xunit.Abstractions;
 
 namespace ParserTests
 {
     public class ConventionalCommit
     {
+        private readonly ITestOutputHelper _logger;
+
+        public ConventionalCommit(ITestOutputHelper logger) => 
+            _logger = logger;
+
+        #region Test Data
+
+        #region Multiline Body (without Footer section) Messages
+        private static readonly string CommitMessageWithBody =
+            @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3";
+
+        private static readonly string CommitMessageWithBodyWhitespaces1 =
+            @$"fix(parser):issue description  {Environment.NewLine}{Environment.NewLine}  this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3";
+
+        private static readonly string CommitMessageWithBodyWhitespaces2 =
+            @$"fix(parser):issue description {Environment.NewLine}{Environment.NewLine}  this is line #1   {Environment.NewLine}  and this is line #2{Environment.NewLine}and this is line #3";
+
+        private static readonly string CommitMessageWithBodyWhitespaces3 =
+            @$"fix(parser):issue description  {Environment.NewLine}{Environment.NewLine}  this is line #1   {Environment.NewLine}  and this is line #2  {Environment.NewLine} and this is line #3";
+
+        private static readonly string CommitMessageWithBodyWhitespacesIntermixed =
+            @$"fix(parser):issue description   {Environment.NewLine}   {Environment.NewLine}  this is line #1   {Environment.NewLine}  and this is line #2  {Environment.NewLine} and this is line #3";
+
+        private static readonly string CommitMessageWithBodyNewlinesAtTheEnd =
+            @$"fix(parser):issue description {Environment.NewLine}{Environment.NewLine}  this is line #1   {Environment.NewLine}  and this is line #2  {Environment.NewLine} and this is line #3 {Environment.NewLine}{Environment.NewLine}";
+
+        private static readonly string CommitMessageWithBodyAndFooter =
+            @$"fix(parser):issue description  {Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3{Environment.NewLine}{Environment.NewLine}foo: bar{Environment.NewLine}bar: foo";
+
+
+        public static IEnumerable<object[]> MultilineBodyCommitMessages
+        {
+            get
+            {
+                yield return new[] { CommitMessageWithBody };
+                yield return new[] { CommitMessageWithBodyWhitespaces1 };
+                yield return new[] { CommitMessageWithBodyWhitespaces2 };
+                yield return new[] { CommitMessageWithBodyWhitespaces3 };
+                yield return new[] { CommitMessageWithBodyNewlinesAtTheEnd };
+                yield return new[] { CommitMessageWithBodyWhitespacesIntermixed };
+            }
+        }
+        #endregion
+
+        #endregion
+
         [Fact(DisplayName = "Can parse minimal message")]
         public void Can_parse_minimal()
         {
@@ -28,54 +75,18 @@ namespace ParserTests
 
         }
 
-        private static readonly string CommitMessageSimple = $"fix(parser):issue description";
-        private static readonly string CommitMessageWithBody =
-            @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3";
-
-        private static readonly string CommitMessageWithBodyAndFooter =
-            @$"fix(parser):issue description{Environment.NewLine}{Environment.NewLine}this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3{Environment.NewLine}{Environment.NewLine}foo: bar{Environment.NewLine}bar: foo";
-
-        public static IEnumerable<object[]> MultilineCommitMessages
-        {
-            get
-            {
-                yield return new[] { CommitMessageSimple };
-                yield return new[] { CommitMessageWithBody };
-                yield return new[] { CommitMessageWithBodyAndFooter };
-            }
-        }
-
         [Theory(DisplayName = "Can parse multiline body in a commit message")]
-        [MemberData(nameof(MultilineCommitMessages))]
-//        [InlineData(@"fix(parser):issue description
-
-//                this is line #1
-//                 and this is line #2
-//            and this is line #3
-//                ")]
-//        [InlineData(@"fix(parser):issue description
-
-
-//                this is line #1
-//                 and this is line #2
-//and this is line #3
-//                ")]
-//        [InlineData(@"fix(parser):issue description
-    
-
-
-
-//                this is line #1
-//                 and this is line #2
-//                    and this is line #3            
-//                ")]
+        [MemberData(nameof(MultilineBodyCommitMessages))]
         public void Can_parse_body_section(string msg)
         {
+            _logger.WriteLine($"Testing parsing of: {msg}");
             var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
 
             syntaxErrors.Should().BeNull();
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
+
+            parsedCommitMessage?.TypeAsString.Should().Be("fix");
 
             parsedCommitMessage?.Type.Should().Be(CommitType.Fix);
             parsedCommitMessage?.Scope.Should().Be("parser");

@@ -15,12 +15,6 @@ namespace Parser.ConventionalCommit
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public partial class ConventionalCommit
     {
-        private static readonly ThreadLocal<ConventionalCommitLexer> CachedLexer = 
-            new(() => new(null));
-
-        private static readonly ThreadLocal<ConventionalCommitParser> CachedParser = 
-            new(() => new(null));
-
         private static readonly ThreadLocal<SyntaxErrorListener> SyntaxErrorListener =
             new(() => new ());
 
@@ -51,8 +45,9 @@ namespace Parser.ConventionalCommit
         public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage, out IReadOnlyList<SyntaxErrorInfo>? syntaxErrors)
         {
             parsedCommitMessage = null;
-            var lexer = CachedLexer.Value;
-            var parser = CachedParser.Value;
+            var lexer = new ConventionalCommitLexer(new AntlrInputStream(commitMessage));//CachedLexer.Value;
+            var parser = new ConventionalCommitParser(new CommonTokenStream(lexer));//CachedParser.Value;
+
             var syntaxErrorListener = SyntaxErrorListener.Value;
             var listener = ParsingWalker.Value;
             listener.Reset();
@@ -65,14 +60,10 @@ namespace Parser.ConventionalCommit
             syntaxErrorListener.Reset();
             try
             {
-
-                lexer!.SetInputStream(new AntlrInputStream(commitMessage));
-                
-                //note: looking at tokens like this is sometimes useful for debugging
+                ////note: looking at tokens like this is sometimes useful for debugging
                 // var tokens = lexer.GetAllTokens().Select(x => (x.Type, x.Text)).ToArray();
                 // lexer.Reset();
 
-                parser!.SetInputStream(new CommonTokenStream(lexer));
 
                 parser.RemoveErrorListeners();
                 parser.AddErrorListener(syntaxErrorListener);
@@ -101,8 +92,7 @@ namespace Parser.ConventionalCommit
             }
             finally
             {
-                lexer.Reset();
-                parser.Reset();
+                listener.Reset();
             }
         }
 

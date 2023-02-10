@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Parser.ConventionalCommit
@@ -23,28 +22,37 @@ namespace Parser.ConventionalCommit
 
             _parseResult.TypeAsString = typeAsString;
 
-            _parseResult.Scope = context.scope.Text;
-            _parseResult.Description = context.description?.Text ?? string.Empty;
-        }
+            if (context.scope != null)
+            {
+                _parseResult.Scope =
+                    context.scope.Text.Trim(' ', '\t');
+            }
 
-        public override void EnterOtherType(ConventionalCommitParser.OtherTypeContext context)
-        {
+            _parseResult.Description = 
+                context.description?.Text.Trim(' ', '\t') ?? string.Empty;
         }
 
         public override void EnterBody(ConventionalCommitParser.BodyContext context)
         {
             if (!StringBuilderPool.TryDequeue(out var sb))
             {
-                sb = new StringBuilder(128);
+                sb = new StringBuilder((int)(context.GetText().Length * 1.5));
             }
 
             try
             {
                 foreach (var bodyLine in context.TEXT())
                 {
-                    sb.AppendLine(bodyLine.GetText());
+                    sb.AppendLine(bodyLine?.GetText()
+                                      .Trim(' ', '\t')
+                                  ?? string.Empty);
                 }
                 _parseResult.Body = sb.ToString();
+
+                if (_parseResult.Body.EndsWith(Environment.NewLine))
+                {
+                    _parseResult.Body = _parseResult.Body.Substring(0, _parseResult.Body.Length - Environment.NewLine.Length);
+                }
             }
             finally
             {
@@ -55,9 +63,21 @@ namespace Parser.ConventionalCommit
 
         public override void EnterFooter(ConventionalCommitParser.FooterContext context)
         {
+            if (context.exception != null)
+            {
+                throw new InvalidOperationException("Failed to parse the footer section", context.exception); //failed to parse the footer
+            }
             foreach (var tuple in context.footerTuple())
             {
-                _parseResult.AddFooterItem(tuple.key.Text, tuple.value.Text);
+                var key = tuple.key?.Text.Trim(' ', '\t');
+                var value = tuple.value?.Text.Trim(' ', '\t');
+
+                if (key == null || value == null)
+                {
+                    continue;
+                }
+
+                _parseResult.AddFooterItem(key, value);
             }
         }
     }

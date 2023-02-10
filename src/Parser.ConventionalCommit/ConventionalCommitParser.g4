@@ -23,14 +23,14 @@ type: value = IDENTIFIER      #OtherType
     ;
 
 footerTuple: key = IDENTIFIER COLON value = TEXT;
-footer: NEXT_SECTION footerTuple (NEWLINE footerTuple)*;
+footer: NEXT_SECTION (footerTuple (NEWLINE footerTuple)*)?;
 
-body: NEXT_SECTION TEXT (NEWLINE TEXT)*;
+body: NEXT_SECTION (TEXT (NEWLINE TEXT)*)?;
 
 commitMessage: 
     type 
-    LPAREN scope = IDENTIFIER RPAREN COLON 
+    (LPAREN scope = IDENTIFIER RPAREN)? COLON
     description = TEXT
-    body? 
+    body?
     footer? 
     EOF;
