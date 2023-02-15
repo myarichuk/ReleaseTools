@@ -11,12 +11,6 @@ namespace Parser.SemanticVersion
 {
     public partial class SemanticVersion
     {
-        private static readonly ThreadLocal<SemanticVersionLexer> CachedLexer = 
-            new(() => new(null));
-
-        private static readonly ThreadLocal<SemanticVersionParser> CachedParser = 
-            new(() => new(null));
-
         private static readonly ThreadLocal<SyntaxErrorListener> SyntaxErrorListener =
             new(() => new());
 
@@ -31,11 +25,10 @@ namespace Parser.SemanticVersion
         public static bool TryParse(string semver, out SemanticVersion parsedSemver, out IReadOnlyList<SyntaxErrorInfo> syntaxErrors)
         {
             parsedSemver = null;
-            var lexer = CachedLexer.Value;
-            var parser = CachedParser.Value;
+            var lexer = new SemanticVersionLexer(new AntlrInputStream(semver));
+            var parser = new SemanticVersionParser(new CommonTokenStream(lexer));
             var syntaxErrorListener = SyntaxErrorListener.Value;
             var listener = ParsingWalker.Value;
-            listener.Reset();
             
             syntaxErrors = null;
 #if DEBUG
@@ -44,9 +37,6 @@ namespace Parser.SemanticVersion
             syntaxErrorListener.Reset();
             try
             {
-                lexer!.SetInputStream(new AntlrInputStream(semver));
-                parser!.SetInputStream(new CommonTokenStream(lexer));
-
                 parser.RemoveErrorListeners();
                 parser.AddErrorListener(syntaxErrorListener);
 #if DEBUG
@@ -71,8 +61,7 @@ namespace Parser.SemanticVersion
             }
             finally
             {
-                lexer.Reset();
-                parser.Reset();
+                listener.Reset();
             }
 
         }
