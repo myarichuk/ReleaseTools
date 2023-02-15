@@ -23,12 +23,14 @@ namespace Parser.ConventionalCommit
 
             _parseResult.TypeAsString = typeAsString;
 
-            _parseResult.Scope = context.scope.Text;
-            _parseResult.Description = context.description?.Text ?? string.Empty;
-        }
+            _parseResult.IsBreaking = context.isBreaking != null;
 
-        public override void EnterOtherType(ConventionalCommitParser.OtherTypeContext context)
-        {
+            if (context.scope()?.value != null)
+            {
+                _parseResult.Scope = context.scope().value.Text;
+            }
+
+            _parseResult.Description = context.description().GetText()?.Trim() ?? string.Empty;
         }
 
         public override void EnterBody(ConventionalCommitParser.BodyContext context)
@@ -40,9 +42,9 @@ namespace Parser.ConventionalCommit
 
             try
             {
-                foreach (var bodyLine in context.TEXT())
+                foreach (var line in context.textLine())
                 {
-                    sb.AppendLine(bodyLine.GetText());
+                    sb.AppendLine(line.GetText());
                 }
                 _parseResult.Body = sb.ToString();
             }
@@ -57,7 +59,12 @@ namespace Parser.ConventionalCommit
         {
             foreach (var tuple in context.footerTuple())
             {
-                _parseResult.AddFooterItem(tuple.key.Text, tuple.value.Text);
+                if (tuple.key.Text.IndexOf("breaking-change", StringComparison.InvariantCultureIgnoreCase) > 0)
+                {
+                    _parseResult.IsBreaking = true;
+                }
+
+                _parseResult.AddFooterItem(tuple.key.Text, tuple.value.GetText());
             }
         }
     }

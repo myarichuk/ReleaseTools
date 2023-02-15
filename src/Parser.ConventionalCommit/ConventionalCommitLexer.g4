@@ -1,82 +1,46 @@
 lexer grammar ConventionalCommitLexer;
-options { caseInsensitive = true; }
 
-@members{
-  private enum State{
-    BeforeDescription,
-    Description,
-    Body,
-    Footer
-  }
-
-  private State _currentState = State.BeforeDescription;
+options {
+  caseInsensitive=true;
 }
 
-fragment CR: '\r';
-fragment LF: '\n';
+fragment Cr: '\r';
+fragment Lf: '\n';
 
-//common 'type' values
-FEAT: 'feat';
-FIX: 'fix';
-DOCS: 'doc' | 'docs';
-STYLE: 'style';
-REFACTOR: 'refact' | 'refactor';
-PERF: 'perf' | 'performance';
-TEST: 'test' | 'testing';
-CHORE: 'chore';
-BUILD: 'build';
-CI: 'ci';
-BREAKING: 'break' | 'breaking';
-SECURITY: 'security';
-REVERT: 'revert';
-CONFIG: 'config';
-UPGRADE: 'upgrade';
-DOWNGRADE: 'downgrade';
-PIN: 'pin';
+Feat: 'feat';
+Fix: 'fix';
+Docs: 'doc' | 'docs';
+Style: 'style';
+Refactor: 'refact' | 'refactor';
+Perf: 'perf' | 'performance';
+Test: 'test' | 'testing';
+Chore: 'chore';
+Build: 'build';
+Ci: 'ci';
+Breaking: 'break' | 'breaking';
+Security: 'security';
+Revert: 'revert';
+Config: 'config';
+Upgrade: 'upgrade';
+Downgrade: 'downgrade';
+Pin: 'pin';
 
+Identifier: [a-z] [a-z0-9_-]*;
 
-IDENTIFIER: 
-    { _currentState != State.Body && 
-      _currentState != State.Description }? 
-    [a-z] [a-z_-]*;
+ExclamationMark: '!';
 
-WS: (' ' | '\t') -> skip;
-LPAREN: '(' -> mode(Scope);
-RPAREN: ')';
-COLON: ':' WS* 
-{
-  if(_currentState == State.BeforeDescription)
-  { _currentState = State.Description; }
-}
--> mode(Text);
+Whitespace: ' ' | '\t';
+LParen: Whitespace* '(' Whitespace* -> pushMode(Scope);
+Colon: Whitespace* ':' Whitespace* -> pushMode(NonHeader);
 
-BREAKING_CHANGE_MARK: '!';
-BREAKING_CHANGE_KEY: 'BREAKING CHANGE' | 'BREAKING-CHANGE';
-
-NEWLINE: CR? LF
-{
-  if (_currentState == State.Body)
-  { Mode(2); }
-  if (_currentState == State.Footer)
-  { Mode(3); }
-};
-
-
-NEXT_SECTION: WS* NEWLINE (WS* NEWLINE)+ WS*
-{
-    if(_currentState == State.Description) 
-        { _currentState = State.Body; Mode(2); }
-    else if (_currentState == State.Body)
-        { _currentState = State.Footer; Mode(3); }
-};
+Newline: Cr? Lf -> pushMode(NonHeader);
 
 mode Scope;
-SCOPE_WITESPACE: ' ' -> skip;
-SCOPE: [a-z] [a-z0-9_/\\]* -> type(IDENTIFIER);
-END_OF_SCOPE: ')' -> mode(DEFAULT_MODE), type(RPAREN);
+Scope: Identifier -> type(Identifier);
+RParen: Whitespace* ')' Whitespace* -> popMode;
 
-mode Text;
-TEXT: ~([\r\n] | [\n])+ { Mode(0); };
-
-mode Footer;
-KEY: IDENTIFIER -> type(IDENTIFIER), mode(DEFAULT_MODE);
+mode NonHeader;
+Word: ~[ :\t\n]+;
+RNewline: Newline -> type(Newline);
+RWhitespace: Whitespace -> type(Whitespace);
+RColon: Colon -> type(Colon);

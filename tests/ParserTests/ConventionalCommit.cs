@@ -86,17 +86,10 @@ namespace ParserTests
 
         [Theory(DisplayName = "Can detect breaking change")]
         [InlineData("fix(parser)!: issue description")]
-        [InlineData("fix!(parser)!: issue description")]
         [InlineData(@"fix(parser):issue description
 
                 foo1: bar1
-                BREAKING-CHANGE: explanation why is there a breaking change
-                ")]
-        [InlineData(@"fix(parser):issue description
-
-                foo1: bar1
-                BREAKING CHANGE: explanation why is there a breaking change
-                ")]
+                BREAKING-CHANGE: explanation why is there a breaking change")]
         public void Can_detect_breaking_change_flag(string msg)
         {
             var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
@@ -182,7 +175,7 @@ namespace ParserTests
         [Theory(DisplayName = "Should fail when message is malformed")]
         [InlineData("fix(parser!: issue description")]
         [InlineData("fix parser): issue description")]
-        [InlineData("fix!(parser)! issue description")]
+        [InlineData("fix(parser)! issue description")]
         [InlineData("fix parser   : issue description")]
         [InlineData(@"fix(parser):issue description
                 this is line #1

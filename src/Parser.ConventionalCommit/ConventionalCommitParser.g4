@@ -1,36 +1,35 @@
 parser grammar ConventionalCommitParser;
 options { tokenVocab = ConventionalCommitLexer; }
 
-type: value = IDENTIFIER      #OtherType
+type: value = Identifier      #OtherType
     | value =
-      (   FEAT
-        | FIX
-        | DOCS
-        | STYLE
-        | REFACTOR
-        | PERF
-        | TEST
-        | CHORE
-        | BUILD
-        | CI
-        | BREAKING
-        | SECURITY
-        | REVERT
-        | CONFIG
-        | UPGRADE
-        | DOWNGRADE
-        | PIN)               #RecorgnizedType
+      (   Feat
+        | Fix
+        | Docs
+        | Style
+        | Refactor
+        | Perf
+        | Test
+        | Chore
+        | Build
+        | Ci
+        | Breaking
+        | Security
+        | Revert
+        | Config
+        | Upgrade
+        | Downgrade
+        | Pin)               #RecorgnizedType
     ;
 
-footerTuple: key = IDENTIFIER COLON value = TEXT;
-footer: NEXT_SECTION footerTuple (NEWLINE footerTuple)*;
+scope: LParen value = Identifier RParen;
 
-body: NEXT_SECTION TEXT (NEWLINE TEXT)*;
+description: textLine;
 
-commitMessage: 
-    type 
-    LPAREN scope = IDENTIFIER RPAREN COLON 
-    description = TEXT
-    body? 
-    footer? 
-    EOF;
+textLine: firstWord = Whitespace* Word (Whitespace+ restOfWords += Word)* Whitespace*;
+body: Whitespace* Newline (Whitespace* Newline)+ textLine (Newline textLine)*;
+
+footerTuple: key = Whitespace* Word Whitespace* Colon Whitespace* value = textLine Whitespace*;
+footer: Whitespace* Newline (Whitespace* Newline)+ footerTuple (Newline footerTuple)* (Newline | Whitespace)*;
+
+commitMessage: type scope? isBreaking = ExclamationMark? Colon description body? footer? EOF;
