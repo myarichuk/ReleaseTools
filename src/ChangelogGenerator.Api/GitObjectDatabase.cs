@@ -1,17 +1,18 @@
-﻿using LibGit2Sharp;
+﻿using System.Runtime.CompilerServices;
+using LibGit2Sharp;
 
 namespace ChangelogGenerator.Api;
 
 public abstract class GitObjectDatabase<TObject> : IDisposable
 {
     private bool _isDisposed;
-    protected Repository _repository;
+    protected readonly Repository Repository;
 
     protected GitObjectDatabase(string repositoryPath)
     {
         ThrowIfInvalidRepo(repositoryPath);
 
-        _repository = new Repository(repositoryPath);
+        Repository = new Repository(repositoryPath);
         AssertRepositoryInGoodState();
     }
 
@@ -19,7 +20,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
     {
         ThrowIfInvalidRepo(repositoryPath);
 
-        _repository = new Repository(
+        Repository = new Repository(
             repositoryPath,
             new RepositoryOptions
             {
@@ -30,15 +31,16 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
 
     public abstract IEnumerable<TObject> Query();
 
-    protected void AssertRepositoryInGoodState()
+    private void AssertRepositoryInGoodState()
     {
-        if (_repository.Info.CurrentOperation != CurrentOperation.None)
+        if (Repository.Info.CurrentOperation != CurrentOperation.None)
         {
-            throw new RepositoryNotReadyException($"Repository is in the middle of a pending interactive operation. Cannot continue. (operation type = {_repository.Info.CurrentOperation})");
+            throw new RepositoryNotReadyException($"Repository is in the middle of a pending interactive operation. Cannot continue. (operation type = {Repository.Info.CurrentOperation})");
         }
     }
 
-    protected static void ThrowIfInvalidRepo(string repositoryPath)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowIfInvalidRepo(string repositoryPath)
     {
         if (!Repository.IsValid(repositoryPath))
         {
@@ -51,7 +53,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
         if (!_isDisposed)
         {
             _isDisposed = true;
-            _repository.Dispose();
+            Repository.Dispose();
         }
     }
 

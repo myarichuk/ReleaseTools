@@ -21,20 +21,20 @@ public class CommitDatabase: GitObjectDatabase<Commit>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override IEnumerable<Commit> Query() => _repository.Commits;
+    public override IEnumerable<Commit> Query() => Repository.Commits;
 
     public IEnumerable<Commit> Query(Sorting commitSorting = Sorting.NewestFirst) => 
-        _repository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
+        Repository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
 
     public IEnumerable<Commit> Query(Commit includeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) =>
-        _repository.Commits.QueryBy(new CommitFilter
+        Repository.Commits.QueryBy(new CommitFilter
         {
             IncludeReachableFrom = includeFromThisCommit.Sha,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
 
     public IEnumerable<Commit> Query(Commit includeFromThisCommit, Commit excludeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) => 
-        _repository.Commits.QueryBy(new CommitFilter
+        Repository.Commits.QueryBy(new CommitFilter
         {
             IncludeReachableFrom = includeFromThisCommit,
             ExcludeReachableFrom = excludeFromThisCommit.Parents,
