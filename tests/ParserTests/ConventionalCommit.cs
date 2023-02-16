@@ -104,12 +104,17 @@ namespace ParserTests
         [InlineData("fix(parser)!: issue description")]
         [InlineData(@"fix(parser):issue description
 
-
                 foo1: bar1
                 BREAKING-CHANGE: explanation why is there a breaking change
                 ")]
         [InlineData(@"fix(parser):issue description
 
+
+
+                foo1: bar1
+                BREAKING-CHANGE: explanation why is there a breaking change
+                ")]
+        [InlineData(@"fix(parser):issue description
 
                 foo1: bar1
                 breaking-change: explanation why is there a breaking change
