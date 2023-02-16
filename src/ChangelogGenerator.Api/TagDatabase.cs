@@ -12,6 +12,6 @@ namespace ChangelogGenerator.Api
         {
         }
 
-        public override IEnumerable<Tag> Query() => Repository.Tags;
+        public override IEnumerable<Tag> Query() => GitRepository.Tags;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using LibGit2Sharp;
-using static ChangelogGenerator.Api.CommitDatabase;
 
 namespace ChangelogGenerator.Api;
 

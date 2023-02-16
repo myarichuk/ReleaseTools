@@ -6,13 +6,13 @@ namespace ChangelogGenerator.Api;
 public abstract class GitObjectDatabase<TObject> : IDisposable
 {
     private bool _isDisposed;
-    protected readonly Repository Repository;
+    protected readonly Repository GitRepository;
 
     protected GitObjectDatabase(string repositoryPath)
     {
         ThrowIfInvalidRepo(repositoryPath);
 
-        Repository = new Repository(repositoryPath);
+        GitRepository = new Repository(repositoryPath);
         AssertRepositoryInGoodState();
     }
 
@@ -20,7 +20,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
     {
         ThrowIfInvalidRepo(repositoryPath);
 
-        Repository = new Repository(
+        GitRepository = new Repository(
             repositoryPath,
             new RepositoryOptions
             {
@@ -33,9 +33,9 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
 
     private void AssertRepositoryInGoodState()
     {
-        if (Repository.Info.CurrentOperation != CurrentOperation.None)
+        if (GitRepository.Info.CurrentOperation != CurrentOperation.None)
         {
-            throw new RepositoryNotReadyException($"Repository is in the middle of a pending interactive operation. Cannot continue. (operation type = {Repository.Info.CurrentOperation})");
+            throw new RepositoryNotReadyException($"Repository is in the middle of a pending interactive operation. Cannot continue. (operation type = {GitRepository.Info.CurrentOperation})");
         }
     }
 
@@ -53,7 +53,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
         if (!_isDisposed)
         {
             _isDisposed = true;
-            Repository.Dispose();
+            GitRepository.Dispose();
         }
     }
 
