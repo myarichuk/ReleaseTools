@@ -26,10 +26,19 @@ scope: LParen value = Identifier RParen;
 
 description: textLine;
 
+nextSection: Whitespace* Newline (Whitespace* Newline)+;
+
 textLine: firstWord = Whitespace* Word (Whitespace+ restOfWords += Word)* Whitespace*;
-body: Whitespace* Newline (Whitespace* Newline)+ textLine (Newline textLine)*;
+body:  textLine (Newline textLine)*;
 
-footerTuple: key = Whitespace* Word Whitespace* Colon Whitespace* value = textLine Whitespace*;
-footer: Whitespace* Newline (Whitespace* Newline)+ footerTuple (Newline footerTuple)* (Newline | Whitespace)*;
+footerTuple: Whitespace* key = Word Whitespace* Colon Whitespace* value = textLine;
+footer: footerTuple (Newline footerTuple)* (Newline | Whitespace)*;
 
-commitMessage: type scope? isBreaking = ExclamationMark? Colon description body? footer? EOF;
+commitMessage: 
+    Whitespace* type Whitespace* 
+    scope? Whitespace* 
+    isBreaking = ExclamationMark? 
+    Whitespace* Colon 
+    Whitespace* description 
+    (nextSection body?)? 
+    (nextSection footer?)? EOF;

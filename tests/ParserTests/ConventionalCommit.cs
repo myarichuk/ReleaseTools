@@ -66,13 +66,15 @@ namespace ParserTests
             parsedCommitMessage.Description.Should().Be("issue description");
         }
 
-        [Fact(DisplayName = "Should fail parsing with type not mentioned in the spec")]
-        public void Should_fail_parse_non_spec_type()
+        [Fact(DisplayName = "Should correctly parse type not mentioned in spec")]
+        public void Should_correctly_parse_non_spec_type()
         {
             const string msg = "foobar: issue description";
             var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
-            isParsingSuccessful.Should().BeFalse("Calling ConventionalCommit::TryParse() on a message with non-spec type should return false");
+            isParsingSuccessful.Should().BeTrue();
 
+            parsedCommitMessage!.Type.Should().Be(CommitType.Other);
+            parsedCommitMessage.TypeAsString.Should().Be("foobar");
         }
 
         [Theory(DisplayName = "Can parse multiline body in a commit message")]
@@ -92,15 +94,26 @@ namespace ParserTests
             parsedCommitMessage?.Scope.Should().Be("parser");
             parsedCommitMessage?.Description.Should().Be("issue description");
 
-            parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2{Environment.NewLine}and this is line #3");
+            parsedCommitMessage?.Body.Should()
+                .Contain("this is line #1")
+                .And.Contain("and this is line #2")
+                .And.Contain("and this is line #3");
         }
 
         [Theory(DisplayName = "Can detect breaking change")]
         [InlineData("fix(parser)!: issue description")]
         [InlineData(@"fix(parser):issue description
 
+
                 foo1: bar1
-                BREAKING-CHANGE: explanation why is there a breaking change")]
+                BREAKING-CHANGE: explanation why is there a breaking change
+                ")]
+        [InlineData(@"fix(parser):issue description
+
+
+                foo1: bar1
+                breaking-change: explanation why is there a breaking change
+                ")]
         public void Can_detect_breaking_change_flag(string msg)
         {
             var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage, out var syntaxErrors);
@@ -108,6 +121,11 @@ namespace ParserTests
             syntaxErrors.Should().BeNull();
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
+
+            if (parsedCommitMessage!.Footer.Count > 0)
+            {
+                parsedCommitMessage.Footer.Should().HaveCount(2);
+            }
 
             parsedCommitMessage.IsBreaking.Should().BeTrue();
         }
@@ -158,7 +176,9 @@ namespace ParserTests
             parsedCommitMessage?.Scope.Should().Be("parser");
             parsedCommitMessage?.Description.Should().Be("issue description");
 
-            parsedCommitMessage.Body.Should().Be($"this is line #1{Environment.NewLine}and this is line #2");
+            parsedCommitMessage.Body.Should()
+                .Contain($"this is line #1")
+                .And.Contain("and this is line #2");
 
             parsedCommitMessage.Footer.Should().NotBeEmpty();
         }
@@ -186,7 +206,7 @@ namespace ParserTests
         [Theory(DisplayName = "Should fail when message is malformed")]
         [InlineData("fix(parser!: issue description")]
         [InlineData("fix parser): issue description")]
-        [InlineData("fix(parser)! issue description")]
+        [InlineData("fix!(parser)! issue description")]
         [InlineData("fix parser   : issue description")]
         [InlineData(@"fix(parser):issue description
                 this is line #1

@@ -29,7 +29,7 @@ namespace Parser.ConventionalCommit
                 _parseResult.Scope = context.scope().value.Text;
             }
 
-            _parseResult.Description = context.description().GetText()?.Trim() ?? string.Empty;
+            _parseResult.Description = context.description()?.GetText()?.Trim() ?? string.Empty;
         }
 
         public override void EnterBody(ConventionalCommitParser.BodyContext context)
@@ -67,12 +67,17 @@ namespace Parser.ConventionalCommit
             }
             foreach (var tuple in context.footerTuple())
             {
-                if (tuple.key.Text.IndexOf("breaking-change", StringComparison.InvariantCultureIgnoreCase) > 0)
+                if(string.IsNullOrWhiteSpace(tuple.key.Text))
+                {
+                    continue;
+                }
+
+                if (tuple.key.Text.IndexOf("breaking-change", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 {
                     _parseResult.IsBreaking = true;
                 }
 
-                _parseResult.AddFooterItem(tuple.key.Text, tuple.value.GetText());
+                _parseResult.AddFooterItem(tuple.key.Text, tuple.value.GetText().Trim());
             }
         }
     }
