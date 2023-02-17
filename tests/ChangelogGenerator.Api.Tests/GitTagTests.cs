@@ -35,10 +35,23 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch tags between certain SHAs from a repo")]
         public void Can_fetch_tags_between()
         {
-            var tags = _tagDatabase.Query(_commitShaSet[1], _commitShaSet[MaxCommits - 2]).ToArray();
+            var tags = _tagDatabase.Query(_commitShaSet[1], _commitShaSet[MaxCommits - 2]);
 
             tags.Select(x => x.Target.Sha)
                 .Should().ContainInOrder(_commitShaSet.Skip(1).Take(MaxCommits - 3));
+        }
+
+        [Fact(DisplayName = "No tags between SHAs should return empty results")]
+        public void No_tags_between_SHAs_should_return_empty_results()
+        {
+            var extraSha1 = CommitDummyFile("foo_a1.txt");
+            CommitDummyFile("foo_a2.txt");
+            CommitDummyFile("foo_a3.txt");
+            var extraSha2 = CommitDummyFile("foo_a4.txt");
+
+            var tags = _tagDatabase.Query(extraSha1, extraSha2);
+
+            tags.Should().BeEmpty();
         }
     }
 }

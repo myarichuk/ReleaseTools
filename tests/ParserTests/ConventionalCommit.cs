@@ -188,8 +188,6 @@ namespace ParserTests
             parsedCommitMessage.Footer.Should().NotBeEmpty();
         }
 
-
-
         [Theory(DisplayName = "Can parse message with scope")]
         [InlineData("fix(parser):issue description")]
         [InlineData("  fix  (parser):  issue description   ")]
