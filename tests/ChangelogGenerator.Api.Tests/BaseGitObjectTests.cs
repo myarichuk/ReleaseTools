@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace ChangelogGenerator.Api.Tests
 {
