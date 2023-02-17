@@ -20,6 +20,10 @@ namespace ChangelogGenerator.Api.Tests
             DeleteOldTestRepos();
 
             GitRepositoryFolder = $"test_repo_{Guid.NewGuid()}";
+
+            Directory.CreateDirectory(GitRepositoryFolder);
+            File.Create(Path.Combine(GitRepositoryFolder, "..", $"{GitRepositoryFolder}_folder.lock"));
+
             Repository.Init(GitRepositoryFolder);
             GitRepository = new Repository(GitRepositoryFolder);
         }
@@ -31,6 +35,19 @@ namespace ChangelogGenerator.Api.Tests
             {
                 try
                 {
+                    File.Delete(Path.Combine(testRepoFolder, "..", $"{testRepoFolder}_folder.lock"));
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                try
+                {
                     DeleteDirectory(testRepoFolder);
                 }
                 catch (Exception ex)
@@ -40,7 +57,10 @@ namespace ChangelogGenerator.Api.Tests
             }
         }
 
-        public void Dispose() => GitRepository.Dispose();
+        public virtual void Dispose()
+        {
+            GitRepository.Dispose();
+        }
 
         //credit: https://github.com/rgl/UseLibgit2sharp/blob/master/Program.cs
         // recursively force the deletion of the given directory.
@@ -86,9 +106,11 @@ namespace ChangelogGenerator.Api.Tests
 
         protected string CommitDummyFile(string filename)
         {
-            File.WriteAllText(Path.Combine(GitRepositoryFolder, filename), "some file contents");
+            var dummyFilePath = Path.Combine(GitRepositoryFolder, filename);
+            File.WriteAllText(dummyFilePath, "some file contents");
+            
+            GitRepository.Index.Add(Path.GetFileName(dummyFilePath));
 
-            Commands.Stage(GitRepository, "*");
             var commitInfo = GitRepository.Commit($"add file {filename}", DefaultSignature, DefaultSignature);
             return commitInfo.Sha;
         }

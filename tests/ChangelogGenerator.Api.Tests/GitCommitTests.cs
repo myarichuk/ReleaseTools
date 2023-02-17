@@ -78,6 +78,35 @@ namespace ChangelogGenerator.Api.Tests
                     "add file foobar2.txt\n");
         }
 
+        [Fact(DisplayName = "Can fetch commits bounded by two commits (reverse sorting) -> using SHAs")]
+        public void Can_fetch_bounded_commits_reverse_by_sha()
+        {
+            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+
+            for (int i = 1; i < 6; i++)
+            {
+                CommitDummyFile($"foobar{i}.txt");
+            }
+
+            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar4.txt\n");
+            commitInfoFrom.Should().NotBeNull(); //sanity check
+
+            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            commitInfoTo.Should().NotBeNull(); //sanity check
+
+            var boundedCommitsQueryResult = commitDb.Query(
+                    commitInfoFrom!.Sha,
+                    commitInfoTo!.Sha,
+                    CommitDatabase.Sorting.OldestFirst)
+                .ToArray();
+
+            var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
+            commitMessages.Should()
+                .ContainInOrder(
+                    "add file foobar4.txt\n",
+                    "add file foobar3.txt\n",
+                    "add file foobar2.txt\n");
+        }
 
         [Fact(DisplayName = "Can fetch commits bounded by two commits")]
         public void Can_fetch_bounded_commits()
