@@ -27,7 +27,13 @@ public class CommitDatabase: GitObjectDatabase<Commit>
     public override IEnumerable<Commit> Query() => GitRepository.Commits;
 
     public IEnumerable<Commit> Query(Sorting commitSorting = Sorting.NewestFirst) => 
-        GitRepository.Commits.QueryBy(new CommitFilter {SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological});
+        GitRepository.Commits.QueryBy(new CommitFilter
+        {
+            SortBy = (commitSorting == Sorting.NewestFirst
+                         ? CommitSortStrategies.Reverse
+                         : CommitSortStrategies.Time) |
+                     CommitSortStrategies.Topological
+        });
 
     public IEnumerable<Commit> Query(Commit includeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) =>
         GitRepository.Commits.QueryBy(new CommitFilter
@@ -36,6 +42,14 @@ public class CommitDatabase: GitObjectDatabase<Commit>
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
 
+    public IEnumerable<Commit> Query(string includeFromThisCommitSha, Sorting commitSorting = Sorting.NewestFirst) =>
+        GitRepository.Commits.QueryBy(new CommitFilter
+        {
+            IncludeReachableFrom = includeFromThisCommitSha,
+            SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
+        });
+
+    
     public IEnumerable<Commit> Query(Commit includeFromThisCommit, Commit excludeFromThisCommit, Sorting commitSorting = Sorting.NewestFirst) => 
         GitRepository.Commits.QueryBy(new CommitFilter
         {
@@ -43,4 +57,18 @@ public class CommitDatabase: GitObjectDatabase<Commit>
             ExcludeReachableFrom = excludeFromThisCommit.Parents,
             SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) | CommitSortStrategies.Topological
         });
+
+    public IEnumerable<Commit> Query(string includeFromThisCommitSha, string excludeFromThisCommitSha, Sorting commitSorting = Sorting.NewestFirst)
+    {
+        var excludeCommit = GitRepository.Lookup<Commit>(excludeFromThisCommitSha);
+        var excludeParents = excludeCommit.Parents;
+
+        return GitRepository.Commits.QueryBy(new CommitFilter
+        {
+            IncludeReachableFrom = includeFromThisCommitSha,
+            ExcludeReachableFrom = excludeParents,
+            SortBy = (commitSorting == Sorting.NewestFirst ? CommitSortStrategies.Reverse : CommitSortStrategies.Time) |
+                     CommitSortStrategies.Topological
+        });
+    }
 }
