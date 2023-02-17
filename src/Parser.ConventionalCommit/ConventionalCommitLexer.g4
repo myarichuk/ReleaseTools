@@ -7,23 +7,23 @@ options {
 fragment Cr: '\r';
 fragment Lf: '\n';
 
-Feat: 'feat';
-Fix: 'fix';
-Docs: 'doc' | 'docs';
+Feat: 'feat' | 'feature' 's'?;
+Fix: 'fix' | 'fixing' | 'fixes';
+Docs: 'doc' | 'docs' | 'document' | 'documentation' ;
 Style: 'style';
-Refactor: 'refact' | 'refactor';
+Refactor: 'refact' | 'refactor' | 'refactoring';
 Perf: 'perf' | 'performance';
-Test: 'test' | 'testing';
-Chore: 'chore';
+Test: 'test' 's'? | 'testing';
+Chore: 'chore' 's'?;
 Build: 'build';
-Ci: 'ci';
+Ci: 'ci' | 'cicd' | 'ci-cd';
 Breaking: 'break' | 'breaking';
 Security: 'security';
-Revert: 'revert';
-Config: 'config';
-Upgrade: 'upgrade';
-Downgrade: 'downgrade';
-Pin: 'pin';
+Revert: 'revert' | 'reverts';
+Config: 'config' | 'configs';
+Upgrade: 'upgrade' 's'? | 'upgrading' |;
+Downgrade: 'downgrade' 's'? | 'downgrading';
+Pin: 'pin' 's'? | 'pinning';
 
 Identifier: [a-z] [a-z0-9_-]*;
 
