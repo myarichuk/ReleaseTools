@@ -4,6 +4,10 @@ namespace ChangelogGenerator.Api
 {
     public class TagDatabase: GitObjectDatabase<Tag>
     {
+        public TagDatabase(Repository gitRepository) : base(gitRepository)
+        {
+        }
+
         public TagDatabase(string repositoryPath) : base(repositoryPath)
         {
         }
@@ -12,6 +16,7 @@ namespace ChangelogGenerator.Api
         {
         }
 
-        public override IEnumerable<Tag> Query() => GitRepository.Tags;
+        public override IQueryable<Tag> Query() => 
+            GitRepository.Tags.AsQueryable();
     }
 }

@@ -7,6 +7,15 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
 {
     private bool _isDisposed;
     protected readonly Repository GitRepository;
+    private readonly bool _ownsRepository;
+
+    protected GitObjectDatabase(Repository gitRepository)
+    {
+        GitRepository = gitRepository;
+        AssertRepositoryInGoodState();
+        _ownsRepository = false;
+        GC.SuppressFinalize(this);
+    }
 
     protected GitObjectDatabase(string repositoryPath)
     {
@@ -14,6 +23,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
 
         GitRepository = new Repository(repositoryPath);
         AssertRepositoryInGoodState();
+        _ownsRepository = true;
     }
 
     protected GitObjectDatabase(string repositoryPath, string username, string email)
@@ -50,7 +60,7 @@ public abstract class GitObjectDatabase<TObject> : IDisposable
 
     private void DisposeThis()
     {
-        if (!_isDisposed)
+        if (!_isDisposed && _ownsRepository)
         {
             _isDisposed = true;
             GitRepository.Dispose();
