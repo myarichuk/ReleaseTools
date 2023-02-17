@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Parser.ConventionalCommit
 {
     /// <summary>
     /// An object that represents a conventional commit messages
     /// </summary>
-    public partial class ConventionalCommit
+    public partial record struct ConventionalCommit
     {
         /// <summary>
         /// Type of the commit, varies from convention to convention
@@ -54,6 +55,11 @@ namespace Parser.ConventionalCommit
         public ConventionalCommit()
         {
             Description = string.Empty;
+            Type = CommitType.Other;
+            TypeAsString = string.Empty;
+            IsBreaking = false;
+            Scope = default;
+            Body = default;
         }
 
         /// <summary>

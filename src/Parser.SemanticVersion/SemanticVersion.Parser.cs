@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -9,7 +8,7 @@ using Parser.SemanticVersion.ErrorListeners;
 
 namespace Parser.SemanticVersion
 {
-    public partial class SemanticVersion
+    public partial record struct SemanticVersion
     {
         private static readonly ThreadLocal<SyntaxErrorListener> SyntaxErrorListener =
             new(() => new());
@@ -24,7 +23,7 @@ namespace Parser.SemanticVersion
 
         public static bool TryParse(string semver, out SemanticVersion parsedSemver, out IReadOnlyList<SyntaxErrorInfo> syntaxErrors)
         {
-            parsedSemver = null;
+            parsedSemver = default;
             var lexer = new SemanticVersionLexer(new AntlrInputStream(semver));
             var parser = new SemanticVersionParser(new CommonTokenStream(lexer));
             var syntaxErrorListener = SyntaxErrorListener.Value;
@@ -50,7 +49,7 @@ namespace Parser.SemanticVersion
                 if (syntaxErrorListener.Errors.Count > 0)
                 {
                     syntaxErrors = syntaxErrorListener.Errors.ToArray();
-                    parsedSemver = null;
+                    parsedSemver = default;
                 }
 
                 return syntaxErrorListener.Errors.Count == 0;

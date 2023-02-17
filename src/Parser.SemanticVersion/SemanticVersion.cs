@@ -1,6 +1,6 @@
 ﻿namespace Parser.SemanticVersion
 {
-    public partial class SemanticVersion
+    public partial record struct SemanticVersion
     {
         /// <summary>
         /// semantic tag of the build section (e.g rc4, build5, alpha.2, beta)

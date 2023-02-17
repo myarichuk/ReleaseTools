@@ -13,7 +13,7 @@ using Parser.ConventionalCommit.ErrorListeners;
 namespace Parser.ConventionalCommit
 {
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public partial class ConventionalCommit
+    public partial record struct ConventionalCommit
     {
         private static readonly ThreadLocal<SyntaxErrorListener> SyntaxErrorListener =
             new(() => new ());
@@ -32,7 +32,7 @@ namespace Parser.ConventionalCommit
         /// <param name="commitMessage">the commit message</param>
         /// <param name="parsedCommitMessage">structure representing the parsed commit message</param>
         /// <returns>true if parsing successful, false otherwise</returns>
-        public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage) =>
+        public static bool TryParse(string commitMessage, out ConventionalCommit parsedCommitMessage) =>
             TryParse(commitMessage, out parsedCommitMessage, out _);
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace Parser.ConventionalCommit
         /// <param name="parsedCommitMessage">structure representing the parsed commit message</param>
         /// <param name="syntaxErrors">list of syntax errors if the parsing has failed</param>
         /// <returns>true if parsing successful, false otherwise</returns>
-        public static bool TryParse(string commitMessage, out ConventionalCommit? parsedCommitMessage, out IReadOnlyList<SyntaxErrorInfo>? syntaxErrors)
+        public static bool TryParse(string commitMessage, out ConventionalCommit parsedCommitMessage, out IReadOnlyList<SyntaxErrorInfo>? syntaxErrors)
         {
-            parsedCommitMessage = null;
+            parsedCommitMessage = default;
             var lexer = new ConventionalCommitLexer(new AntlrInputStream(commitMessage));//CachedLexer.Value;
             var parser = new ConventionalCommitParser(new CommonTokenStream(lexer));//CachedParser.Value;
 
@@ -84,7 +84,7 @@ namespace Parser.ConventionalCommit
                 if (syntaxErrorListener.Errors.Count > 0)
                 {
                     syntaxErrors = syntaxErrorListener.Errors.ToArray();
-                    parsedCommitMessage = null;
+                    parsedCommitMessage = default;
                 }
 
                 return syntaxErrorListener.Errors.Count == 0;
