@@ -88,13 +88,13 @@ namespace ParserTests
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
 
-            parsedCommitMessage?.TypeAsString.Should().Be("fix");
+            parsedCommitMessage.TypeAsString.Should().Be("fix");
 
-            parsedCommitMessage?.Type.Should().Be(CommitType.Fix);
-            parsedCommitMessage?.Scope.Should().Be("parser");
-            parsedCommitMessage?.Description.Should().Be("issue description");
+            parsedCommitMessage.Type.Should().Be(CommitType.Fix);
+            parsedCommitMessage.Scope.Should().Be("parser");
+            parsedCommitMessage.Description.Should().Be("issue description");
 
-            parsedCommitMessage?.Body.Should()
+            parsedCommitMessage.Body.Should()
                 .Contain("this is line #1")
                 .And.Contain("and this is line #2")
                 .And.Contain("and this is line #3");
@@ -177,9 +177,9 @@ namespace ParserTests
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
 
-            parsedCommitMessage?.Type.Should().Be(CommitType.Fix);
-            parsedCommitMessage?.Scope.Should().Be("parser");
-            parsedCommitMessage?.Description.Should().Be("issue description");
+            parsedCommitMessage.Type.Should().Be(CommitType.Fix);
+            parsedCommitMessage.Scope.Should().Be("parser");
+            parsedCommitMessage.Description.Should().Be("issue description");
 
             parsedCommitMessage.Body.Should()
                 .Contain($"this is line #1")
@@ -201,9 +201,9 @@ namespace ParserTests
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
 
-            parsedCommitMessage?.Type.Should().Be(CommitType.Fix);
-            parsedCommitMessage?.Scope.Should().Be("parser");
-            parsedCommitMessage?.Description.Should().Be("issue description");
+            parsedCommitMessage.Type.Should().Be(CommitType.Fix);
+            parsedCommitMessage.Scope.Should().Be("parser");
+            parsedCommitMessage.Description.Should().Be("issue description");
         }
     }
 }

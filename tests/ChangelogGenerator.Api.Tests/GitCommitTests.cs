@@ -1,3 +1,4 @@
+using ChangelogGenerator.Api.Databases;
 using FluentAssertions;
 using Xunit.Abstractions;
 

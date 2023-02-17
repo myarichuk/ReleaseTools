@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using ChangelogGenerator.Api.Databases;
+using FluentAssertions;
 using Xunit.Abstractions;
 
 namespace ChangelogGenerator.Api.Tests
