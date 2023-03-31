@@ -1,5 +1,5 @@
-using ChangelogGenerator.Api.Databases;
 using FluentAssertions;
+using LibGit2Sharp;
 using Xunit.Abstractions;
 
 namespace ChangelogGenerator.Api.Tests
@@ -13,7 +13,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch specific commit from Query() method")]
         public void Can_fetch_specific_commit()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -30,7 +30,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch all commits")]
         public void Can_fetch_commits()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -52,7 +52,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch commits bounded by two commits (reverse sorting)")]
         public void Can_fetch_bounded_commits_reverse()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -66,9 +66,9 @@ namespace ChangelogGenerator.Api.Tests
             commitInfoTo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResult = commitDb.Query(
-                    commitInfoFrom!,
-                    commitInfoTo!,
-                    CommitDatabase.Sorting.OldestFirst)
+                    new QueryParams(commitInfoFrom?.Sha,
+                        commitInfoTo?.Sha,
+                        ResultSorting.OldestFirst))
                 .ToArray();
 
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
@@ -82,7 +82,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch commits bounded by two commits (reverse sorting) -> using SHAs")]
         public void Can_fetch_bounded_commits_reverse_by_sha()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -96,9 +96,10 @@ namespace ChangelogGenerator.Api.Tests
             commitInfoTo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResult = commitDb.Query(
-                    commitInfoFrom!.Sha,
+                    new QueryParams(
+                        commitInfoFrom!.Sha,
                     commitInfoTo!.Sha,
-                    CommitDatabase.Sorting.OldestFirst)
+                    ResultSorting.OldestFirst))
                 .ToArray();
 
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
@@ -112,7 +113,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch commits bounded by two commits")]
         public void Can_fetch_bounded_commits()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -125,7 +126,11 @@ namespace ChangelogGenerator.Api.Tests
             var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
             commitInfoTo.Should().NotBeNull(); //sanity check
 
-            var boundedCommitsQueryResult = commitDb.Query(commitInfoFrom!, commitInfoTo!).ToArray();
+            var boundedCommitsQueryResult = commitDb.Query(
+                    new QueryParams(
+                        commitInfoFrom?.Sha,
+                    commitInfoTo?.Sha))
+                .ToArray();
 
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
             commitMessages.Should()
@@ -138,7 +143,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch commits starting from specific sha")]
         public void Can_fetch_commits_starting_from_sha()
         {
-            using var commitDb = new CommitDatabase(GitRepositoryFolder);
+            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -148,7 +153,7 @@ namespace ChangelogGenerator.Api.Tests
             var commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar3.txt\n");
             commitInfo.Should().NotBeNull(); //sanity check
 
-            var boundedCommitsQueryResults = commitDb.Query(commitInfo!);
+            var boundedCommitsQueryResults = commitDb.Query(new QueryParams(commitInfo?.Sha, null));
             
             var commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
             commitMessages.Should()
@@ -160,7 +165,7 @@ namespace ChangelogGenerator.Api.Tests
             commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
             commitInfo.Should().NotBeNull(); 
 
-            boundedCommitsQueryResults = commitDb.Query(commitInfo!);
+            boundedCommitsQueryResults = commitDb.Query(new QueryParams(commitInfo?.Sha, null));
             commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
