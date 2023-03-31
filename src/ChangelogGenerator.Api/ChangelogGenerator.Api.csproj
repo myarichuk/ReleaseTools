@@ -14,5 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Parser.ConventionalCommit\Parser.ConventionalCommit.csproj" />
+    <ProjectReference Include="..\Parser.SemanticVersion\Parser.SemanticVersion.csproj" />
   </ItemGroup>
 </Project>

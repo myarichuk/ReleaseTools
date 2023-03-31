@@ -1,8 +1,8 @@
 ﻿using LibGit2Sharp;
 
-namespace ChangelogGenerator.Api
+namespace ChangelogGenerator.Api.Databases
 {
-    public class TagDatabase: GitObjectDatabase<Tag>
+    public class TagDatabase : GitObjectDatabase<Tag>
     {
         public TagDatabase(Repository gitRepository) : base(gitRepository)
         {
@@ -16,7 +16,7 @@ namespace ChangelogGenerator.Api
         {
         }
 
-        public override IQueryable<Tag> Query() => 
+        public override IQueryable<Tag> Query() =>
             GitRepository.Tags.AsQueryable();
 
         /// <summary>

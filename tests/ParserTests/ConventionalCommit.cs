@@ -1,5 +1,4 @@
-﻿using System.Dynamic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Parser.ConventionalCommit;
 using Xunit.Abstractions;
 

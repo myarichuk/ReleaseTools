@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using LibGit2Sharp;
 
-namespace ChangelogGenerator.Api;
+namespace ChangelogGenerator.Api.Databases;
 
 public abstract class GitObjectDatabase<TObject> : IDisposable
 {
