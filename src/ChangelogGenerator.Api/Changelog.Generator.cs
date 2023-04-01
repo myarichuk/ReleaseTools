@@ -7,9 +7,9 @@ namespace ChangelogGenerator.Api
     public partial record struct Changelog
     {
         public static IEnumerable<ChangelogEntry> GenerateEntries(
-            string gitRepositoryFolder, 
-            string? fromSha = null, 
-            string? toSha = null)
+            string gitRepositoryFolder,
+            string? toSha = null,
+            string? fromSha = null)
         {
             var commitDb = new CommitRepository(new Repository(gitRepositoryFolder));
             List<Commit> commitsToProcess;

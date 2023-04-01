@@ -105,14 +105,14 @@ namespace ChangelogGenerator.Api.Tests
             Directory.Delete(path);
         }
 
-        protected string CommitDummyFile(string filename)
+        protected string CommitDummyFile(string filename, string? comment = null)
         {
             var dummyFilePath = Path.Combine(GitRepositoryFolder, filename);
             File.WriteAllText(dummyFilePath, "some file contents");
             
             GitRepository.Index.Add(Path.GetFileName(dummyFilePath));
 
-            var commitInfo = GitRepository.Commit($"chore: add file {filename}", DefaultSignature, DefaultSignature);
+            var commitInfo = GitRepository.Commit(comment ?? $"chore: add file {filename}", DefaultSignature, DefaultSignature);
             return commitInfo.Sha;
         }
     }
