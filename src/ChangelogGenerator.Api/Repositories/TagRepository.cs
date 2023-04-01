@@ -1,16 +1,17 @@
 ﻿using LibGit2Sharp;
+
 // ReSharper disable RegionWithSingleElement
 
-namespace ChangelogGenerator.Api;
+namespace ChangelogGenerator.Api.Repositories;
 
-public sealed class TagRepository: GitObjectRepository<Tag, QueryParams>
+internal sealed class TagRepository : ObjectRepository<Tag, QueryParams>
 {
 
     public TagRepository(Repository repository) : base(repository)
     {
     }
 
-    public override IQueryable<Tag> Query() => 
+    public override IQueryable<Tag> Query() =>
         Repository.Tags.AsQueryable();
 
     public override IQueryable<Tag> Query(in QueryParams @params)

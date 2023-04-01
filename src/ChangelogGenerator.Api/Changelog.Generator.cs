@@ -1,16 +1,17 @@
-﻿using LibGit2Sharp;
+﻿using ChangelogGenerator.Api.Repositories;
+using LibGit2Sharp;
 using Parser.ConventionalCommit;
 
 namespace ChangelogGenerator.Api
 {
     public partial record struct Changelog
     {
-        private static IEnumerable<ChangelogEntry> GenerateEntries(
+        public static IEnumerable<ChangelogEntry> GenerateEntries(
             string gitRepositoryFolder, 
             string? fromSha = null, 
             string? toSha = null)
         {
-            var commitDb = new CommitRepository(new Repository());
+            var commitDb = new CommitRepository(new Repository(gitRepositoryFolder));
             List<Commit> commitsToProcess;
             if (fromSha != null && toSha != null)
             {

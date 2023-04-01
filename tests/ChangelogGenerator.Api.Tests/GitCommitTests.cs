@@ -1,3 +1,4 @@
+using ChangelogGenerator.Api.Repositories;
 using FluentAssertions;
 using LibGit2Sharp;
 using Xunit.Abstractions;

@@ -1,10 +1,11 @@
 ﻿using LibGit2Sharp;
+
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace ChangelogGenerator.Api;
+namespace ChangelogGenerator.Api.Repositories;
 
-public abstract class GitObjectRepository<TQueryResultItem, TQueryParameters>
+internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
 {
     protected readonly Repository Repository;
 
@@ -15,7 +16,7 @@ public abstract class GitObjectRepository<TQueryResultItem, TQueryParameters>
                  CommitSortStrategies.Topological
     };
 
-    protected GitObjectRepository(Repository repository)
+    protected ObjectRepository(Repository repository)
     {
         Repository = repository;
         AssertRepositoryInGoodState();
