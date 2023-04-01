@@ -3,15 +3,8 @@
 
 namespace ChangelogGenerator.Api;
 
-public class TagRepository: GitObjectRepository<Tag, TagRepository.QueryParams>
+public sealed class TagRepository: GitObjectRepository<Tag, QueryParams>
 {
-    #region Query Parameters
-    public record struct QueryParams(
-        string IncludeFromSha, 
-        string? ExcludeFromSha)
-    {
-    }
-    #endregion
 
     public TagRepository(Repository repository) : base(repository)
     {
@@ -22,16 +15,13 @@ public class TagRepository: GitObjectRepository<Tag, TagRepository.QueryParams>
 
     public override IQueryable<Tag> Query(in QueryParams @params)
     {
-        var excludeCommit = Repository.Lookup<Commit>(@params.ExcludeFromSha);
+        var excludeCommit = Repository.Lookup<Commit>(@params.ExcludeToFromSha);
         var excludeParents = excludeCommit.Parents;
 
         var relevantCommitSha = new HashSet<string>(
-            Repository.Commits.QueryBy(new CommitFilter
-            {
-                IncludeReachableFrom = @params.IncludeFromSha,
-                ExcludeReachableFrom = excludeParents,
-                SortBy = CommitSortStrategies.Reverse | CommitSortStrategies.Topological
-            }).Select(c => c.Sha));
+            Repository.Commits.QueryBy(
+                CreateBetweenShaFilter(@params, excludeParents))
+                .Select(c => c.Sha));
 
         return relevantCommitSha.Count == 0
             ? Enumerable.Empty<Tag>().AsQueryable()
