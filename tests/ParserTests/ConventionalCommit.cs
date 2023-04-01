@@ -52,17 +52,18 @@ namespace ParserTests
 
         #endregion
 
-        [Fact(DisplayName = "Can parse minimal message")]
-        public void Can_parse_minimal()
+        [Theory(DisplayName = "Can parse minimal message")]
+        [InlineData("fix: issue description", "issue description", CommitType.Fix)]
+        [InlineData("chore :   add file foobar1.txt\n", "add file foobar1.txt", CommitType.Chore)]
+        public void Can_parse_minimal(string rawCommitMessage, string commitDescription, CommitType commitType)
         {
-            const string msg = "fix: issue description";
-            var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(msg, out var parsedCommitMessage);
+            var isParsingSuccessful = Parser.ConventionalCommit.ConventionalCommit.TryParse(rawCommitMessage, out var parsedCommitMessage);
 
             isParsingSuccessful.Should().BeTrue("the message being parsed is a valid one");
             parsedCommitMessage.Should().NotBeNull("successful parsing should not return null");
 
-            parsedCommitMessage.Type.Should().Be(CommitType.Fix);
-            parsedCommitMessage.Description.Should().Be("issue description");
+            parsedCommitMessage.Type.Should().Be(commitType);
+            parsedCommitMessage.Description.Should().Be(commitDescription);
         }
 
         [Fact(DisplayName = "Should correctly parse type not mentioned in spec")]

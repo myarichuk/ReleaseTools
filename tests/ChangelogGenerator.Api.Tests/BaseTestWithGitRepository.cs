@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace ChangelogGenerator.Api.Tests
 {
-    public abstract class BaseGitObjectTests: IDisposable
+    public abstract class BaseTestWithGitRepository: IDisposable
     {
         protected readonly ITestOutputHelper Log;
         protected readonly string GitRepositoryFolder;
@@ -14,7 +14,7 @@ namespace ChangelogGenerator.Api.Tests
         protected static readonly Signature DefaultSignature = 
             new("John Dow", "john.dow@foobar.com", DateTimeOffset.UtcNow);
 
-        protected BaseGitObjectTests(ITestOutputHelper log)
+        protected BaseTestWithGitRepository(ITestOutputHelper log)
         {
             Log = log;
 
@@ -112,7 +112,7 @@ namespace ChangelogGenerator.Api.Tests
             
             GitRepository.Index.Add(Path.GetFileName(dummyFilePath));
 
-            var commitInfo = GitRepository.Commit($"add file {filename}", DefaultSignature, DefaultSignature);
+            var commitInfo = GitRepository.Commit($"chore: add file {filename}", DefaultSignature, DefaultSignature);
             return commitInfo.Sha;
         }
     }

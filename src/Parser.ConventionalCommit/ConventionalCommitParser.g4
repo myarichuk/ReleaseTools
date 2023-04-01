@@ -39,6 +39,6 @@ commitMessage:
     scope? Whitespace* 
     isBreaking = ExclamationMark? 
     Whitespace* Colon 
-    Whitespace* description 
+    Whitespace* description
     (nextSection body?)? 
     (nextSection footer?)? EOF;

@@ -45,6 +45,8 @@ namespace Parser.ConventionalCommit
         public static bool TryParse(string commitMessage, out ConventionalCommit parsedCommitMessage, out IReadOnlyList<SyntaxErrorInfo>? syntaxErrors)
         {
             parsedCommitMessage = default;
+            commitMessage = commitMessage.Trim(' ', '\n', '\r');
+
             var lexer = new ConventionalCommitLexer(new AntlrInputStream(commitMessage));//CachedLexer.Value;
             var parser = new ConventionalCommitParser(new CommonTokenStream(lexer));//CachedParser.Value;
 

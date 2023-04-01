@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using Parser.ConventionalCommit;
 
 namespace ChangelogGenerator.Api

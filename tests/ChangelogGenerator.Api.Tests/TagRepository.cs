@@ -1,19 +1,18 @@
-﻿using ChangelogGenerator.Api.Repositories;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Xunit.Abstractions;
 
 namespace ChangelogGenerator.Api.Tests
 {
-    public class GitTagTests: BaseGitObjectTests
+    public class TagRepository: BaseTestWithGitRepository
     {
-        private readonly TagRepository _tagRepository;
+        private readonly Repositories.TagRepository _tagRepository;
         private readonly List<string> _commitShaSet = new();
 
         private const int MaxCommits = 10;
 
-        public GitTagTests(ITestOutputHelper log) : base(log)
+        public TagRepository(ITestOutputHelper log) : base(log)
         {
-            _tagRepository = new TagRepository(GitRepository);
+            _tagRepository = new Repositories.TagRepository(GitRepository);
 
             for (int i = 0; i < MaxCommits; i++)
             {

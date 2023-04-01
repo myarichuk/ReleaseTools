@@ -5,23 +5,23 @@ using Xunit.Abstractions;
 
 namespace ChangelogGenerator.Api.Tests
 {
-    public class GitCommitTests: BaseGitObjectTests
+    public class CommitRepository: BaseTestWithGitRepository
     {
-        public GitCommitTests(ITestOutputHelper log) : base(log)
+        public CommitRepository(ITestOutputHelper log) : base(log)
         {
         }
 
         [Fact(DisplayName = "Can fetch specific commit from Query() method")]
         public void Can_fetch_specific_commit()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
                 CommitDummyFile($"foobar{i}.txt");
             }
 
-            var commitInfoByMessage = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar3.txt\n");
+            var commitInfoByMessage = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar3.txt\n");
             commitInfoByMessage.Should().NotBeNull();
 
             var commitInfoBySha = commitDb.Query().FirstOrDefault(c => c.Tree.Sha == commitInfoByMessage!.Tree.Sha);
@@ -31,7 +31,7 @@ namespace ChangelogGenerator.Api.Tests
         [Fact(DisplayName = "Can fetch all commits")]
         public void Can_fetch_commits()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
@@ -43,27 +43,27 @@ namespace ChangelogGenerator.Api.Tests
             var commitMessages = commitsQueryResult.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar1.txt\n",
-                    "add file foobar2.txt\n",
-                    "add file foobar3.txt\n",
-                    "add file foobar4.txt\n",
-                    "add file foobar5.txt\n");
+                    "chore: add file foobar1.txt\n",
+                    "chore: add file foobar2.txt\n",
+                    "chore: add file foobar3.txt\n",
+                    "chore: add file foobar4.txt\n",
+                    "chore: add file foobar5.txt\n");
         }
 
         [Fact(DisplayName = "Can fetch commits bounded by two commits (reverse sorting)")]
         public void Can_fetch_bounded_commits_reverse()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
                 CommitDummyFile($"foobar{i}.txt");
             }
 
-            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar4.txt\n");
+            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar4.txt\n");
             commitInfoFrom.Should().NotBeNull(); //sanity check
 
-            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar2.txt\n");
             commitInfoTo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResult = commitDb.Query(
@@ -75,25 +75,25 @@ namespace ChangelogGenerator.Api.Tests
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar4.txt\n",
-                    "add file foobar3.txt\n",
-                    "add file foobar2.txt\n");
+                    "chore: add file foobar4.txt\n",
+                    "chore: add file foobar3.txt\n",
+                    "chore: add file foobar2.txt\n");
         }
 
         [Fact(DisplayName = "Can fetch commits bounded by two commits (reverse sorting) -> using SHAs")]
         public void Can_fetch_bounded_commits_reverse_by_sha()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
                 CommitDummyFile($"foobar{i}.txt");
             }
 
-            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar4.txt\n");
+            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar4.txt\n");
             commitInfoFrom.Should().NotBeNull(); //sanity check
 
-            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar2.txt\n");
             commitInfoTo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResult = commitDb.Query(
@@ -106,25 +106,25 @@ namespace ChangelogGenerator.Api.Tests
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar4.txt\n",
-                    "add file foobar3.txt\n",
-                    "add file foobar2.txt\n");
+                    "chore: add file foobar4.txt\n",
+                    "chore: add file foobar3.txt\n",
+                    "chore: add file foobar2.txt\n");
         }
 
         [Fact(DisplayName = "Can fetch commits bounded by two commits")]
         public void Can_fetch_bounded_commits()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
                 CommitDummyFile($"foobar{i}.txt");
             }
 
-            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar4.txt\n");
+            var commitInfoFrom = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar4.txt\n");
             commitInfoFrom.Should().NotBeNull(); //sanity check
 
-            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            var commitInfoTo = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar2.txt\n");
             commitInfoTo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResult = commitDb.Query(
@@ -136,22 +136,22 @@ namespace ChangelogGenerator.Api.Tests
             var commitMessages = boundedCommitsQueryResult.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar2.txt\n",
-                    "add file foobar3.txt\n",
-                    "add file foobar4.txt\n");
+                    "chore: add file foobar2.txt\n",
+                    "chore: add file foobar3.txt\n",
+                    "chore: add file foobar4.txt\n");
         }
 
         [Fact(DisplayName = "Can fetch commits starting from specific sha")]
         public void Can_fetch_commits_starting_from_sha()
         {
-            var commitDb = new CommitRepository(new Repository(GitRepositoryFolder));
+            var commitDb = new Repositories.CommitRepository(new Repository(GitRepositoryFolder));
 
             for (int i = 1; i < 6; i++)
             {
                 CommitDummyFile($"foobar{i}.txt");
             }
 
-            var commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar3.txt\n");
+            var commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar3.txt\n");
             commitInfo.Should().NotBeNull(); //sanity check
 
             var boundedCommitsQueryResults = commitDb.Query(new QueryParams(commitInfo?.Sha, null));
@@ -159,19 +159,19 @@ namespace ChangelogGenerator.Api.Tests
             var commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar1.txt\n",
-                    "add file foobar2.txt\n",
-                    "add file foobar3.txt\n");
+                    "chore: add file foobar1.txt\n",
+                    "chore: add file foobar2.txt\n",
+                    "chore: add file foobar3.txt\n");
 
-            commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "add file foobar2.txt\n");
+            commitInfo = commitDb.Query().FirstOrDefault(c => c.Message == "chore: add file foobar2.txt\n");
             commitInfo.Should().NotBeNull(); 
 
             boundedCommitsQueryResults = commitDb.Query(new QueryParams(commitInfo?.Sha, null));
             commitMessages = boundedCommitsQueryResults.Select(x => x.Message);
             commitMessages.Should()
                 .ContainInOrder(
-                    "add file foobar1.txt\n",
-                    "add file foobar2.txt\n");
+                    "chore: add file foobar1.txt\n",
+                    "chore: add file foobar2.txt\n");
         }
     }
 }
