@@ -5,6 +5,11 @@
 
 namespace ChangelogGenerator.Api.Repositories;
 
+/// <summary>
+/// Represents an internal abstract class for managing Git objects in a repository.
+/// </summary>
+/// <typeparam name="TQueryResultItem">The type of query result item.</typeparam>
+/// <typeparam name="TQueryParameters">The type of query parameters.</typeparam>
 internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
 {
     protected readonly Repository Repository;
@@ -22,8 +27,17 @@ internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
         AssertRepositoryInGoodState();
     }
 
-    //template method pattern :)
+    /// <summary>
+    /// Queries the Git objects without parameters.
+    /// </summary>
+    /// <returns>An IQueryable of <see cref="TQueryResultItem"/> objects.</returns>
     public abstract IQueryable<TQueryResultItem> Query();
+
+    /// <summary>
+    /// Queries the Git objects using the specified query parameters.
+    /// </summary>
+    /// <param name="params">The query parameters of type <see cref="TQueryParameters"/>.</param>
+    /// <returns>An IQueryable of <see cref="TQueryResultItem"/> objects.</returns>
     public abstract IQueryable<TQueryResultItem> Query(in TQueryParameters @params);
 
     private void AssertRepositoryInGoodState()

@@ -9,9 +9,7 @@ namespace ChangelogGenerator.Api
     /// <param name="Commit"></param>
     /// <param name="Sha"></param>
     /// <param name="Author"></param>
-    public record struct ChangelogEntry(ConventionalCommit Commit, string Sha, Author Author)
-    {
-    }
+    public readonly record struct ChangelogEntry(ConventionalCommit Commit, string Sha, Author Author, string Encoding);
 
     /// <summary>
     /// An object representing the author of the commit
@@ -19,7 +17,7 @@ namespace ChangelogGenerator.Api
     /// <param name="Name"></param>
     /// <param name="Email"></param>
     /// <param name="When"></param>
-    public record struct Author(string Name, string Email, DateTimeOffset When)
+    public readonly record struct Author(string Name, string Email, DateTimeOffset When)
     {
         internal static Author From(Signature commitSignature) =>
             new(commitSignature.Name, commitSignature.Email, commitSignature.When);

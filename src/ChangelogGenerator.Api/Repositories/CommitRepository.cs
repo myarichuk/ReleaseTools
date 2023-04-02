@@ -5,8 +5,15 @@ using LibGit2Sharp;
 
 namespace ChangelogGenerator.Api.Repositories;
 
+/// <summary>
+/// Represents an internal sealed class for managing commit objects in a Git repository, derived from the ObjectRepository class.
+/// </summary>
 internal sealed class CommitRepository : ObjectRepository<Commit, QueryParams>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommitRepository"/> class with the specified Git repository.
+    /// </summary>
+    /// <param name="repository">The Git repository.</param>
     public CommitRepository(Repository repository) : base(repository)
     {
     }
@@ -19,6 +26,12 @@ internal sealed class CommitRepository : ObjectRepository<Commit, QueryParams>
 
     public override IQueryable<Commit> Query(in QueryParams @params)
     {
+        if (@params.ExcludeToFromSha == null &&
+            @params.IncludeFromSha == null)
+        {
+            return Query();
+        }
+
         var excludeFromCommit = LookupBySha(@params.ExcludeToFromSha);
 
         return Repository.Commits.QueryBy(CreateBetweenShaFilter(@params, excludeFromCommit?.Parents!)).AsQueryable();
