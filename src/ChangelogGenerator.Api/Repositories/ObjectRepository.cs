@@ -10,9 +10,10 @@ namespace ChangelogGenerator.Api.Repositories;
 /// </summary>
 /// <typeparam name="TQueryResultItem">The type of query result item.</typeparam>
 /// <typeparam name="TQueryParameters">The type of query parameters.</typeparam>
-internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
+internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>: IDisposable
 {
     protected readonly Repository Repository;
+    private readonly bool _ownsRepository;
 
     // ReSharper disable once StaticMemberInGenericType
     protected static readonly CommitFilter ParameterlessFilter = new()
@@ -21,9 +22,10 @@ internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
                  CommitSortStrategies.Topological
     };
 
-    protected ObjectRepository(Repository repository)
+    protected ObjectRepository(Repository repository, bool ownsRepository = true)
     {
         Repository = repository;
+        _ownsRepository = ownsRepository;
         AssertRepositoryInGoodState();
     }
 
@@ -58,4 +60,12 @@ internal abstract class ObjectRepository<TQueryResultItem, TQueryParameters>
                          : CommitSortStrategies.Time) |
                      CommitSortStrategies.Topological
         };
+
+    public void Dispose()
+    {
+        if(_ownsRepository)
+        {
+            Repository.Dispose();
+        }
+    }
 }

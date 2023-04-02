@@ -10,6 +10,16 @@ namespace ChangelogGenerator.Api
     public partial record struct Changelog
     {
         /// <summary>
+        /// Generates a changelog from the Git repository based on the specified parameters.
+        /// </summary>
+        public static Changelog Generate(
+            SemanticVersion version, 
+            string gitRepositoryFolder, 
+            string? toSha = null,
+            string? fromSha = null) =>
+            new(GenerateEntries(gitRepositoryFolder, toSha, fromSha), version);
+
+        /// <summary>
         /// Generates a list of changelog entries from the Git repository based on the specified parameters.
         /// </summary>
         /// <param name="gitRepositoryFolder">The path to the Git repository folder.</param>
@@ -22,7 +32,7 @@ namespace ChangelogGenerator.Api
             string? toSha = null,
             string? fromSha = null)
         {
-            var commitDb = new CommitRepository(new Repository(gitRepositoryFolder));
+            using var commitDb = new CommitRepository(new Repository(gitRepositoryFolder));
             var commitsToProcess = 
                 commitDb.Query(new QueryParams(fromSha, toSha))
                     .ToList();
