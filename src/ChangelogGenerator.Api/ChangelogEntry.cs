@@ -9,7 +9,11 @@ namespace ChangelogGenerator.Api
     /// <param name="Commit"></param>
     /// <param name="Sha"></param>
     /// <param name="Author"></param>
-    public readonly record struct ChangelogEntry(ConventionalCommit Commit, string Sha, Author Author, string Encoding);
+    public readonly record struct ChangelogEntry(
+        ConventionalCommit Commit, 
+        string Sha, 
+        Author Author, 
+        string Encoding);
 
     /// <summary>
     /// An object representing the author of the commit
